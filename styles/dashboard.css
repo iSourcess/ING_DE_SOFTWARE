@@ -1,0 +1,233 @@
+/* static/css/dashboard.css */
+:root {
+    --header-height: 150px;
+    --sidebar-width: 250px;
+    --primary-color: #4a90e2;
+    --dark-color: #333;
+    --text-color: #444;
+    --transition-speed: 0.3s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    padding-top: var(--header-height);
+}
+
+/* Header fijo */
+.fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.header-dark {
+    background-color: var(--dark-color);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
+
+.header-blue {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
+
+/* Botón hamburguesa */
+.menu-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1100;
+    cursor: pointer;
+    color: white;
+    font-size: 1rem;
+    padding: 1rem;
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    left: -var(--sidebar-width);
+    top: var(--header-height);
+    width: var(--sidebar-width);
+    height: calc(100vh - var(--header-height));
+    background-color: white;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    transition: left var(--transition-speed);
+    z-index: 900;
+    overflow-y: auto;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar-header {
+    padding: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.sidebar-content {
+    padding: 1rem;
+}
+
+.index-list {
+    list-style: none;
+}
+
+.index-list li {
+    margin-bottom: 0.5rem;
+}
+
+.index-list a {
+    color: var(--text-color);
+    text-decoration: none;
+    display: block;
+    padding: 0.5rem;
+    transition: background-color var(--transition-speed);
+}
+
+.index-list a:hover {
+    background-color: #f0f0f0;
+}
+
+/* Menú desplegable */
+.dropdown-menu {
+    position: fixed;
+    top: var(--header-height);
+    right: -300px;
+    width: 300px;
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    transition: right var(--transition-speed);
+    z-index: 900;
+}
+
+.dropdown-menu.active {
+    right: 0;
+}
+
+.user-info {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.menu-items {
+    padding: 1rem;
+}
+
+.menu-items a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: background-color var(--transition-speed);
+}
+
+.menu-items a:hover {
+    background-color: #f0f0f0;
+}
+
+.logout-btn {
+    color: #dc3545 !important;
+}
+
+/* Overlay */
+.overlay {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+    background-color: rgba(0,0,0,0.5);
+    display: none;
+    z-index: 800;
+}
+
+.overlay.active {
+    display: block;
+}
+
+/* Contenido principal */
+.main-content {
+    padding: 2rem;
+    margin-left: 0;
+    transition: margin-left var(--transition-speed);
+}
+
+.main-content.shifted {
+    margin-left: var(--sidebar-width);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.post-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Agregar al dashboard.css */
+.menu-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 100;
+    cursor: pointer;
+    color: white;
+    font-size: 1.5rem; /* Aumentamos el tamaño */
+    padding: 0.60rem;
+    background-color: rgba(0,0,0,0.2); /* Fondo semi-transparente */
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.menu-toggle:hover {
+    background-color: rgba(0,0,0,0.3);
+}
+
+/* Media queries */
+@media (max-width: 768px) {
+    .main-content.shifted {
+        margin-left: 0;
+    }
+    
+    .sidebar {
+        width: 100%;
+        left: -100%;
+    }
+}

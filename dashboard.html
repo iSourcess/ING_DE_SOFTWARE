@@ -1,0 +1,73 @@
+<!-- dashboard.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Dashboard</title>
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <!-- Header fijo -->
+    <header class="fixed-header">
+        <div class="header-blue">
+            <h2>Efra's Blog</h2>
+        </div>
+        <!-- Botón hamburguesa -->
+        <div class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <!-- Sidebar desplegable -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Índice</h3>
+        </div>
+        <div class="sidebar-content">
+            <!-- Aquí irá el índice dinámico -->
+            <ul class="index-list">
+                <li><a href="#section1">Sección 1</a></li>
+                <li><a href="#section2">Sección 2</a></li>
+                <li><a href="#section3">Sección 3</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Menú desplegable (hamburguesa) -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="user-info">
+            <img src="{{ url_for('static', filename='img/default-avatar.png') }}" alt="User Avatar" class="avatar">
+            <span>{{ current_user.name }}</span>
+        </div>
+        <div class="menu-items">
+            <a href="{{ url_for('dashboard') }}"><i class="fas fa-home"></i> Main</a>
+            <a href="{{ url_for('help') }}"><i class="fas fa-question-circle"></i> Help</a>
+            <a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact us</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Overlay para cuando el sidebar está abierto -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="container">
+            {% for post in posts %}
+            <article class="post-card">
+                <h2>{{ post.title }}</h2>
+                <h3>{{ post.subtitle }}</h3>
+                <p class="post-date">Post date {{ post.post_date.strftime('%d/%m/%Y') }}</p>
+                <p class="post-content">{{ post.content }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </main>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
