@@ -7,6 +7,7 @@
     <title>Blog Dashboard</title>
     <link rel="stylesheet" href="styles/dashboard.css">
     <script src="js/theme-toggle.js"></script>
+    <script src="js/theme-utils.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
@@ -14,13 +15,21 @@
     <header class="fixed-header">
         <div class="header-blue">
             <h2>Nombre proyecto</h2>
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Buscar...">
+                    <button id="searchButton">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
         </div>
         <button class="theme-toggle" id="themeToggle">
             <i id="themeIcon" class="fas fa-moon"></i>
         </button>
         <!-- Botón hamburguesa -->
         <div class="menu-toggle" id="menuToggle">
-            <i class="fas fa-bars"></i>
+            <i class="fas fa-user"></i>
         </div>
     </header>
 
@@ -107,18 +116,16 @@
         </div>
     </nav>
 
-    <!-- Menú desplegable (hamburguesa) -->
+    <!-- Menú desplegable (hamburguesa) con solo info de usuario -->
     <div class="dropdown-menu" id="dropdownMenu">
         <div class="user-info">
             <img src="icons/avatar.svg" alt="User Avatar" class="avatar">
             <span>{{ current_user.name }}</span>
         </div>
         <div class="menu-items">
-            <a href="{{ url_for('dashboard') }}"><i class="fas fa-home"></i> Main</a>
-            <a href="{{ url_for('help') }}"><i class="fas fa-question-circle"></i> Help</a>
-            <a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact us</a>
+            <a href="{{ url_for('perfil') }}"><i class="fas fa-user-circle"></i> Mi Perfil</a>
             <a href="{{ url_for('logout') }}" class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Logout
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
             </a>
         </div>
     </div>

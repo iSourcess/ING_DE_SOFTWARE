@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de PDFs</title>
+    <link rel="stylesheet" href="styles/busqueda.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="layout-container">
+        <!-- Sidebar con menú de navegación -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>Categorías</h2>
+                <button id="close-sidebar" class="mobile-only">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="menu-container">
+                <ul class="main-menu">
+                    <li>
+                        <div class="menu-item">
+                            <a href="#section1">Docencia</a>
+                            <i class="fas fa-chevron-down toggle-submenu"></i>
+                        </div>
+                        <ul class="submenu">
+                            <li><a href="#docencia-1" data-category="docencia-cursos">Cursos impartidos</a></li>
+                            <li><a href="#docencia-2" data-category="docencia-material">Material didáctico</a></li>
+                            <li><a href="#docencia-3" data-category="docencia-evaluaciones">Evaluaciones</a></li>
+                            <li><a href="#docencia-4" data-category="docencia-programas">Programas académicos</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <div class="menu-item">
+                            <a href="#section2">Investigación</a>
+                            <i class="fas fa-chevron-down toggle-submenu"></i>
+                        </div>
+                        <ul class="submenu">
+                            <li><a href="#investigacion-1" data-category="investigacion-proyectos">Proyectos actuales</a></li>
+                            <li><a href="#investigacion-2" data-category="investigacion-publicaciones">Publicaciones</a></li>
+                            <li><a href="#investigacion-3" data-category="investigacion-colaboraciones">Colaboraciones</a></li>
+                            <li><a href="#investigacion-4" data-category="investigacion-financiamiento">Financiamiento</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <div class="menu-item">
+                            <a href="#section3">Extensión y difusión</a>
+                            <i class="fas fa-chevron-down toggle-submenu"></i>
+                        </div>
+                        <ul class="submenu">
+                            <li><a href="#extension-1" data-category="extension-conferencias">Conferencias</a></li>
+                            <li><a href="#extension-2" data-category="extension-talleres">Talleres</a></li>
+                            <li><a href="#extension-3" data-category="extension-eventos">Eventos públicos</a></li>
+                            <li><a href="#extension-4" data-category="extension-medios">Medios de comunicación</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <div class="menu-item">
+                            <a href="#section4">Artículos científicos</a>
+                            <i class="fas fa-chevron-down toggle-submenu"></i>
+                        </div>
+                        <ul class="submenu">
+                            <li><a href="#articulos-1" data-category="articulos-publicados">Publicados</a></li>
+                            <li><a href="#articulos-2" data-category="articulos-revision">En revisión</a></li>
+                            <li><a href="#articulos-3" data-category="articulos-preparacion">En preparación</a></li>
+                            <li><a href="#articulos-4" data-category="articulos-colaboraciones">Colaboraciones</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <div class="menu-item">
+                            <a href="#seccion5">Tutorías</a>
+                            <i class="fas fa-chevron-down toggle-submenu"></i>
+                        </div>
+                        <ul class="submenu">
+                            <li><a href="#tutorias-1" data-category="tutorias-actuales">Estudiantes actuales</a></li>
+                            <li><a href="#tutorias-2" data-category="tutorias-graduados">Graduados</a></li>
+                            <li><a href="#tutorias-3" data-category="tutorias-tesis">Proyectos de tesis</a></li>
+                            <li><a href="#tutorias-4" data-category="tutorias-asesorias">Asesorías</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <div class="menu-item">
+                            <a href="#seccion6">Gestión</a>
+                            <i class="fas fa-chevron-down toggle-submenu"></i>
+                        </div>
+                        <ul class="submenu">
+                            <li><a href="#gestion-1" data-category="gestion-comites">Comités</a></li>
+                            <li><a href="#gestion-2" data-category="gestion-coordinacion">Coordinación</a></li>
+                            <li><a href="#gestion-3" data-category="gestion-proyectos">Proyectos administrativos</a></li>
+                            <li><a href="#gestion-4" data-category="gestion-informes">Informes</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Contenido principal -->
+        <div class="main-content">
+            <header>
+                <div class="header-left">
+                    <button id="toggle-sidebar" class="mobile-only">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="project-name">Nombre proyecto</h1>
+                </div>
+                <div class="header-controls">
+                    <button id="theme-toggle" aria-label="Cambiar tema">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button id="user-profile" aria-label="Perfil de usuario">
+                        <i class="fas fa-user"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Buscar...">
+                    <button id="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="filters-container">
+                <div class="active-category" id="current-category">
+                    <span>Todas las categorías</span>
+                    <button id="clear-category" class="hidden">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-date">Ordenar por:</label>
+                    <select id="filter-date">
+                        <option value="newest">Más reciente</option>
+                        <option value="oldest">Más antiguo</option>
+                        <option value="name-asc">Nombre (A-Z)</option>
+                        <option value="name-desc">Nombre (Z-A)</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-year">Año:</label>
+                    <select id="filter-year">
+                        <option value="all">Todos</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                    </select>
+                </div>
+            </div>
+
+            <main>
+                <div class="file-list-container">
+                    <div class="loop-indicator">{% for post in posts %}</div>
+                    
+                    <div class="file-card">
+                        <h2 class="file-title">{{ post.title }}</h2>
+                        <h3 class="file-subtitle">{{ post.subtitle }}</h3>
+                        <div class="file-date">Post date {{ post.post_date.strftime('%d/%m/%Y') }}</div>
+                        <div class="file-category">Categoría: {{ post.category }}</div>
+                        <div class="file-content">{{ post.content }}</div>
+                        <div class="file-actions">
+                            <button class="view-button"><i class="fas fa-eye"></i> Ver</button>
+                            <button class="download-button"><i class="fas fa-download"></i> Descargar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="loop-end-indicator">{% endfor %}</div>
+                </div>
+
+                <div id="no-results" class="hidden">
+                    <p>No se encontraron resultados para tu búsqueda.</p>
+                </div>
+
+                <div id="file-viewer" class="hidden">
+                    <div class="viewer-header">
+                        <h2 id="viewer-title"></h2>
+                        <div class="viewer-controls">
+                            <button id="download-viewing"><i class="fas fa-download"></i></button>
+                            <button id="close-viewer"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <iframe id="pdf-frame" src=""></iframe>
+                </div>
+            </main>
+
+            <footer>
+                <p>&copy; 2025 Buscador de PDFs | Todos los derechos reservados</p>
+            </footer>
+        </div>
+    </div>
+
+    <script src="js/busqueda.js"></script>
+</body>
+</html>

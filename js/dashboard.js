@@ -10,7 +10,9 @@ class DashboardManager {
             themeToggle: document.getElementById('themeToggle'),
             themeIcon: document.getElementById('themeIcon'),
             submenuToggles: document.querySelectorAll('.toggle-submenu'),
-            menuItems: document.querySelectorAll('.menu-item')
+            menuItems: document.querySelectorAll('.menu-item'),
+            searchInput: document.getElementById('searchInput'),
+            searchButton: document.getElementById('searchButton')
         };
 
         // State
@@ -28,6 +30,8 @@ class DashboardManager {
         this.handleThemeToggle = this.handleThemeToggle.bind(this);
         this.handleSubmenuToggle = this.handleSubmenuToggle.bind(this);
         this.handleWindowResize = this.handleWindowResize.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
+        this.handleStorageChange = this.handleStorageChange.bind(this);
     }
 
     init() {
@@ -37,6 +41,10 @@ class DashboardManager {
             this.attachEventListeners();
             this.initializeSubmenuHandlers();
             this.setupWindowResizeHandler();
+            this.initializeSearchFunctionality();
+            
+            // Añadir detector de cambios en localStorage para sincronización entre pestañas
+            window.addEventListener('storage', this.handleStorageChange);
         } catch (error) {
             console.error('Dashboard initialization failed:', error);
         }
@@ -52,13 +60,23 @@ class DashboardManager {
     }
 
     initializeTheme() {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        this.setTheme(savedTheme);
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        this.applyTheme(isDarkMode);
     }
 
-    setTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        this.elements.themeIcon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+    applyTheme(isDarkMode) {
+        document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+        document.body.classList.toggle('dark-theme', isDarkMode);
+        if (this.elements.themeIcon) {
+            this.elements.themeIcon.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+        }
+    }
+
+    handleStorageChange(event) {
+        if (event.key === 'darkMode') {
+            const isDarkMode = event.newValue === 'true';
+            this.applyTheme(isDarkMode);
+        }
     }
 
     setupWindowResizeHandler() {
@@ -78,47 +96,82 @@ class DashboardManager {
 
     attachEventListeners() {
         // Menu and sidebar event listeners
-        this.elements.menuToggle.addEventListener('click', this.handleMenuToggle);
-        this.elements.overlay.addEventListener('click', this.handleOverlayClick);
+        if (this.elements.menuToggle) {
+            this.elements.menuToggle.addEventListener('click', this.handleMenuToggle);
+        }
+        if (this.elements.overlay) {
+            this.elements.overlay.addEventListener('click', this.handleOverlayClick);
+        }
         document.addEventListener('dblclick', this.handleEdgeDoubleClick);
         document.addEventListener('keydown', this.handleKeyPress);
         
         // Theme toggle
-        this.elements.themeToggle.addEventListener('click', this.handleThemeToggle);
+        if (this.elements.themeToggle) {
+            this.elements.themeToggle.addEventListener('click', this.handleThemeToggle);
+        }
 
         // Sidebar hover functionality
-        this.elements.sidebar.addEventListener('mouseenter', () => {
-            if (!this.state.isSidebarOpen && window.innerWidth >= 768) {
-                this.elements.sidebar.style.left = '0';
-            }
-        });
+        if (this.elements.sidebar) {
+            this.elements.sidebar.addEventListener('mouseenter', () => {
+                if (!this.state.isSidebarOpen && window.innerWidth >= 768) {
+                    this.elements.sidebar.style.left = '0';
+                }
+            });
 
-        this.elements.sidebar.addEventListener('mouseleave', () => {
-            if (!this.state.isSidebarOpen && window.innerWidth >= 768) {
-                this.elements.sidebar.style.left = `calc(-1 * (var(--sidebar-width) - 10px))`;
-            }
-        });
+            this.elements.sidebar.addEventListener('mouseleave', () => {
+                if (!this.state.isSidebarOpen && window.innerWidth >= 768) {
+                    this.elements.sidebar.style.left = `calc(-1 * (var(--sidebar-width) - 10px))`;
+                }
+            });
+        }
     }
 
     initializeSubmenuHandlers() {
-        this.elements.submenuToggles.forEach(toggle => {
-            toggle.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.handleSubmenuToggle(toggle);
-            });
-        });
-
-        this.elements.menuItems.forEach(item => {
-            const link = item.querySelector('a');
-            if (link) {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth < 768 && this.state.isMenuOpen) {
-                        this.closeMenu();
-                    }
+        if (this.elements.submenuToggles) {
+            this.elements.submenuToggles.forEach(toggle => {
+                toggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.handleSubmenuToggle(toggle);
                 });
-            }
-        });
+            });
+        }
+
+        if (this.elements.menuItems) {
+            this.elements.menuItems.forEach(item => {
+                const link = item.querySelector('a');
+                if (link) {
+                    link.addEventListener('click', () => {
+                        if (window.innerWidth < 768 && this.state.isMenuOpen) {
+                            this.closeMenu();
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    initializeSearchFunctionality() {
+        if (this.elements.searchButton) {
+            this.elements.searchButton.addEventListener('click', this.handleSearch);
+        }
+        
+        if (this.elements.searchInput) {
+            this.elements.searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.handleSearch();
+                }
+            });
+        }
+    }
+
+    handleSearch() {
+        const searchTerm = this.elements.searchInput.value.trim();
+        
+        if (!searchTerm) return;
+        
+        // Redirect to the search results page with the term as a query parameter
+        window.location.href = `/busqueda?q=${encodeURIComponent(searchTerm)}`;
     }
 
     handleSubmenuToggle(toggle) {
@@ -151,7 +204,9 @@ class DashboardManager {
 
     handleMenuToggle() {
         this.state.isMenuOpen = !this.state.isMenuOpen;
-        this.elements.dropdownMenu.classList.toggle('active');
+        if (this.elements.dropdownMenu) {
+            this.elements.dropdownMenu.classList.toggle('active');
+        }
         
         if (this.state.isSidebarOpen) {
             this.closeSidebar();
@@ -175,8 +230,12 @@ class DashboardManager {
         
         if (event.clientX < EDGE_THRESHOLD) {
             this.state.isSidebarOpen = !this.state.isSidebarOpen;
-            this.elements.sidebar.classList.toggle('active');
-            this.elements.mainContent.classList.toggle('shifted');
+            if (this.elements.sidebar) {
+                this.elements.sidebar.classList.toggle('active');
+            }
+            if (this.elements.mainContent) {
+                this.elements.mainContent.classList.toggle('shifted');
+            }
             
             if (this.state.isMenuOpen) {
                 this.closeMenu();
@@ -200,28 +259,38 @@ class DashboardManager {
 
     handleThemeToggle() {
         const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        this.setTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
+        const isDarkMode = currentTheme !== 'dark';
+        this.applyTheme(isDarkMode);
+        localStorage.setItem('darkMode', isDarkMode.toString());
     }
 
     closeMenu() {
-        this.elements.dropdownMenu.classList.remove('active');
+        if (this.elements.dropdownMenu) {
+            this.elements.dropdownMenu.classList.remove('active');
+        }
         this.state.isMenuOpen = false;
     }
 
     closeSidebar() {
-        this.elements.sidebar.classList.remove('active');
-        this.elements.mainContent.classList.remove('shifted');
+        if (this.elements.sidebar) {
+            this.elements.sidebar.classList.remove('active');
+        }
+        if (this.elements.mainContent) {
+            this.elements.mainContent.classList.remove('shifted');
+        }
         this.state.isSidebarOpen = false;
     }
 
     toggleOverlay() {
-        this.elements.overlay.classList.toggle('active');
+        if (this.elements.overlay) {
+            this.elements.overlay.classList.toggle('active');
+        }
     }
 
     hideOverlay() {
-        this.elements.overlay.classList.remove('active');
+        if (this.elements.overlay) {
+            this.elements.overlay.classList.remove('active');
+        }
     }
 }
 

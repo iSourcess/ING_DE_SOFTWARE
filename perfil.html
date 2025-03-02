@@ -1,0 +1,258 @@
+<!-- perfil.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Blog Dashboard</title>
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="stylesheet" href="styles/perfil.css">
+    <link rel="stylesheet" href="styles/theme-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <!-- Header fijo -->
+    <header class="fixed-header">
+        <div class="header-blue">
+            <h2>Nombre proyecto</h2>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i id="themeIcon" class="fas fa-moon"></i>
+        </button>
+        
+        <!-- Botón hamburguesa -->
+        <div class="menu-toggle" id="menuToggle">
+            <i class="fas fa-user"></i>
+        </div>
+    </header>
+
+    <!-- Menú desplegable (hamburguesa) con solo info de usuario -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="user-info">
+            <img src="icons/avatar.svg" alt="User Avatar" class="avatar">
+            <span>{{ current_user.name }}</span>
+        </div>
+        <div class="menu-items">
+            <a href="{{ url_for('perfil') }}"><i class="fas fa-user-circle"></i> Mi Perfil</a>
+            <a href="{{ url_for('settings') }}"><i class="fas fa-cog"></i> Configuración</a>
+            <a href="{{ url_for('help') }}"><i class="fas fa-question-circle"></i> Ayuda</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
+        </div>
+    </div>
+
+    <!-- Overlay para cuando el sidebar está abierto -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Contenido principal - Perfil de usuario -->
+    <main class="main-content">
+        <div class="container perfil-container">
+            <div class="perfil-card">
+                <div class="perfil-header">
+                    <div class="perfil-avatar">
+                        <img src="icons/avatar.svg" alt="User Avatar" class="avatar-large">
+                        <button class="change-avatar-btn"><i class="fas fa-camera"></i></button>
+                    </div>
+                    <div class="perfil-info">
+                        <h1>{{ current_user.name }}</h1>
+                        <p class="perfil-subtitle">{{ current_user.role }}</p>
+                    </div>
+                </div>
+                
+                <div class="perfil-content">
+                    <div class="perfil-section">
+                        <h2><i class="fas fa-info-circle"></i> Información Personal</h2>
+                        <div class="perfil-data">
+                            <div class="data-row">
+                                <div class="data-label">Nombre completo:</div>
+                                <div class="data-value">{{ current_user.name }}</div>
+                            </div>
+                            <div class="data-row">
+                                <div class="data-label">Email:</div>
+                                <div class="data-value">{{ current_user.email }}</div>
+                            </div>
+                            <div class="data-row">
+                                <div class="data-label">Teléfono:</div>
+                                <div class="data-value">{{ current_user.phone }}</div>
+                            </div>
+                            <div class="data-row">
+                                <div class="data-label">Departamento:</div>
+                                <div class="data-value">{{ current_user.department }}</div>
+                            </div>
+                            <div class="data-row">
+                                <div class="data-label">Cargo:</div>
+                                <div class="data-value">{{ current_user.position }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="perfil-section">
+                        <h2><i class="fas fa-cog"></i> Configuración de Cuenta</h2>
+                        <div class="perfil-buttons">
+                            <button class="btn primary-btn"><i class="fas fa-edit"></i> Editar Perfil</button>
+                            <button class="btn secondary-btn"><i class="fas fa-key"></i> Cambiar Contraseña</button>
+                            <button class="btn secondary-btn"><i class="fas fa-bell"></i> Preferencias de Notificación</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Nueva sección de actividad reciente -->
+                    <div class="perfil-section">
+                        <h2><i class="fas fa-chart-line"></i> Actividad Reciente</h2>
+                        <div class="activity-timeline">
+                            <div class="activity-item">
+                                <div class="activity-icon"><i class="fas fa-file-alt"></i></div>
+                                <div class="activity-details">
+                                    <div class="activity-title">Documento actualizado</div>
+                                    <div class="activity-time">Hace 2 horas</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon"><i class="fas fa-comment"></i></div>
+                                <div class="activity-details">
+                                    <div class="activity-title">Comentario en proyecto</div>
+                                    <div class="activity-time">Ayer</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon"><i class="fas fa-tasks"></i></div>
+                                <div class="activity-details">
+                                    <div class="activity-title">Tarea completada</div>
+                                    <div class="activity-time">Hace 3 días</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="perfil-footer">
+                        <a href="{{ url_for('dashboard') }}" class="btn back-btn"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Nuevo contenido profesional para la columna derecha -->
+            <div class="sidebar-content">
+                <!-- Sección de Contacto -->
+                <div class="sidebar-card" id="contact-section">
+                    <div class="sidebar-card-header">
+                        <h3><i class="fas fa-envelope"></i> Contáctanos</h3>
+                    </div>
+                    <div class="sidebar-card-content">
+                        <form class="contact-form">
+                            <div class="form-group">
+                                <label for="contact-name">Nombre</label>
+                                <input type="text" id="contact-name" placeholder="Tu nombre">
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-email">Email</label>
+                                <input type="email" id="contact-email" placeholder="tu@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-subject">Asunto</label>
+                                <input type="text" id="contact-subject" placeholder="Asunto">
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-message">Mensaje</label>
+                                <textarea id="contact-message" rows="4" placeholder="Tu mensaje"></textarea>
+                            </div>
+                            <button type="submit" class="btn primary-btn contact-btn">Enviar Mensaje</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Recursos Útiles -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header">
+                        <h3><i class="fas fa-book"></i> Recursos Útiles</h3>
+                    </div>
+                    <div class="sidebar-card-content">
+                        <ul class="resources-list">
+                            <li><a href="#"><i class="fas fa-file-pdf"></i> Guía de Usuario</a></li>
+                            <li><a href="#"><i class="fas fa-video"></i> Tutoriales</a></li>
+                            <li><a href="#"><i class="fas fa-question-circle"></i> Preguntas Frecuentes</a></li>
+                            <li><a href="#"><i class="fas fa-download"></i> Plantillas</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Próximos Eventos -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header">
+                        <h3><i class="fas fa-calendar-alt"></i> Próximos Eventos</h3>
+                    </div>
+                    <div class="sidebar-card-content">
+                        <div class="event-item">
+                            <div class="event-date">
+                                <span class="event-day">15</span>
+                                <span class="event-month">MAR</span>
+                            </div>
+                            <div class="event-details">
+                                <h4>Webinar: Nuevas Funcionalidades</h4>
+                                <p>10:00 AM - 11:30 AM</p>
+                            </div>
+                        </div>
+                        <div class="event-item">
+                            <div class="event-date">
+                                <span class="event-day">22</span>
+                                <span class="event-month">MAR</span>
+                            </div>
+                            <div class="event-details">
+                                <h4>Taller de Productividad</h4>
+                                <p>2:00 PM - 4:00 PM</p>
+                            </div>
+                        </div>
+                        <a href="#" class="see-all-link">Ver todos los eventos <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Nuevo Footer profesional -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Sobre Nosotros</h4>
+                <p>Somos una plataforma dedicada a mejorar la productividad y comunicación de equipos profesionales a través de soluciones digitales innovadoras.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Enlaces Rápidos</h4>
+                <ul>
+                    <li><a href="#">Inicio</a></li>
+                    <li><a href="#">Servicios</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Políticas</a></li>
+                    <li><a href="#">Términos y Condiciones</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contacto</h4>
+                <ul class="contact-info">
+                    <li><i class="fas fa-map-marker-alt"></i> Av. Principal 123, Ciudad</li>
+                    <li><i class="fas fa-phone"></i> +34 912 345 678</li>
+                    <li><i class="fas fa-envelope"></i> info@nombreproyecto.com</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Boletín Informativo</h4>
+                <p>Suscríbete para recibir actualizaciones y noticias.</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Tu correo electrónico" required>
+                    <button type="submit" class="newsletter-btn"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Nombre Proyecto. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="js/perfil.js"></script>
+</body>
+</html>
