@@ -29,8 +29,6 @@ const pdfFiles = [
         categoryName: "Docencia - Programas académicos",
         url: "docs/programa_matematicas_2025.pdf"
     },
-    // Resto de los datos...
-    // (Se conservan todos los elementos del array original)
 ];
 
 // Variables globales

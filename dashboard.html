@@ -1,4 +1,3 @@
-<!-- dashboard.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,32 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog Dashboard</title>
     <link rel="stylesheet" href="styles/dashboard.css">
-    <script src="js/theme-toggle.js"></script>
+    <link rel="stylesheet" href="styles/file-explorer.css">
     <script src="js/theme-utils.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <!-- Header fijo -->
-    <header class="fixed-header">
-        <div class="header-blue">
-            <h2>Nombre proyecto</h2>
-            <div class="search-container">
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Buscar...">
-                    <button id="searchButton">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
+    <header class="header-blue fixed-header">
+        <div class="header-left">
+          <h1>Titulo del Dashboard</h1>
+        </div>
+        <div class="header-right">
+          <div class="search-container">
+            <div class="search-box">
+              <input type="text" id="searchInput" placeholder="Buscar...">
+              <button id="searchButton"><i class="fas fa-search"></i></button>
             </div>
+          </div>
+          <div class="header-controls">
+            <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon" id="themeIcon"></i></button>
+            <button class="menu-toggle" id="menuToggle"><i class="fas fa-user"></i></button>
+          </div>
         </div>
-        <button class="theme-toggle" id="themeToggle">
-            <i id="themeIcon" class="fas fa-moon"></i>
-        </button>
-        <!-- Botón hamburguesa -->
-        <div class="menu-toggle" id="menuToggle">
-            <i class="fas fa-user"></i>
-        </div>
-    </header>
+      </header>
 
     <!-- Sidebar desplegable -->
     <nav class="sidebar" id="sidebar">
@@ -116,7 +112,7 @@
         </div>
     </nav>
 
-    <!-- Menú desplegable (hamburguesa) con solo info de usuario -->
+    <!-- Menú desplegable (hamburguesa) con info de usuario -->
     <div class="dropdown-menu" id="dropdownMenu">
         <div class="user-info">
             <img src="icons/avatar.svg" alt="User Avatar" class="avatar">
@@ -124,26 +120,145 @@
         </div>
         <div class="menu-items">
             <a href="{{ url_for('perfil') }}"><i class="fas fa-user-circle"></i> Mi Perfil</a>
+            
             <a href="{{ url_for('logout') }}" class="logout-btn">
                 <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
             </a>
         </div>
     </div>
 
-    <!-- Overlay para cuando el sidebar está abierto -->
-    <div class="overlay" id="overlay"></div>
-
     <!-- Contenido principal -->
     <main class="main-content">
-        <div class="container">
-            {% for post in posts %}
-            <article class="post-card">
-                <h2>{{ post.title }}</h2>
-                <h3>{{ post.subtitle }}</h3>
-                <p class="post-date">Post date {{ post.post_date.strftime('%d/%m/%Y') }}</p>
-                <p class="post-content">{{ post.content }}</p>
-            </article>
-            {% endfor %}
+        <div class="explorer-container">
+            <!-- Breadcrumb navigation -->
+            <div class="breadcrumb">
+                <span><i class="fas fa-home"></i></span>
+                <span class="separator">/</span>
+                <span>Mis Documentos</span>
+            </div>
+            
+            <!-- Actions toolbar -->
+            <div class="explorer-actions">
+                <button class="action-btn create-folder-btn">
+                    <i class="fas fa-folder-plus"></i> Nueva Carpeta
+                </button>
+                <button class="action-btn upload-btn">
+                    <i class="fas fa-file-upload"></i> Subir Archivo
+                </button>
+                <div class="view-options">
+                    <button class="view-btn active" data-view="grid">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button class="view-btn" data-view="list">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- File explorer content -->
+            <div class="explorer-content grid-view">
+                <!-- Docencia section -->
+                <div class="folder-item" data-section="docencia">
+                    <div class="folder-icon">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="folder-details">
+                        <span class="folder-name">Docencia</span>
+                    </div>
+                </div>
+                
+                <!-- Investigación section -->
+                <div class="folder-item" data-section="investigacion">
+                    <div class="folder-icon">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="folder-details">
+                        <span class="folder-name">Investigación</span>
+                    </div>
+                </div>
+                
+                <!-- Extensión section -->
+                <div class="folder-item" data-section="extension">
+                    <div class="folder-icon">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="folder-details">
+                        <span class="folder-name">Extensión y difusión</span>
+                    </div>
+                </div>
+                
+                <!-- Artículos section -->
+                <div class="folder-item" data-section="articulos">
+                    <div class="folder-icon">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="folder-details">
+                        <span class="folder-name">Artículos científicos</span>
+                    </div>
+                </div>
+                
+                <!-- Tutorías section -->
+                <div class="folder-item" data-section="tutorias">
+                    <div class="folder-icon">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="folder-details">
+                        <span class="folder-name">Tutorías</span>
+                    </div>
+                </div>
+                
+                <!-- Gestión section -->
+                <div class="folder-item" data-section="gestion">
+                    <div class="folder-icon">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="folder-details">
+                        <span class="folder-name">Gestión</span>
+                    </div>
+                </div>
+                
+                <!-- Example of a file -->
+                <div class="file-item">
+                    <div class="file-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="file-details">
+                        <span class="file-name">Programa de estudio - Matemáticas avanzadas</span>
+                        <span class="file-meta">14/01/2025 | PDF</span>
+                    </div>
+                </div>
+                
+                <!-- Example of another file -->
+                <div class="file-item">
+                    <div class="file-icon">
+                        <i class="fas fa-file-word"></i>
+                    </div>
+                    <div class="file-details">
+                        <span class="file-name">Syllabus Semestre 2025-I</span>
+                        <span class="file-meta">05/01/2025 | DOC</span>
+                    </div>
+                </div>
+                
+                <!-- Example of another file -->
+                <div class="file-item">
+                    <div class="file-icon">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <div class="file-details">
+                        <span class="file-name">Calificaciones parciales</span>
+                        <span class="file-meta">28/02/2025 | XLS</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- No items placeholder (initially hidden) -->
+            <div class="no-items-message" style="display: none;">
+                <i class="fas fa-folder-open"></i>
+                <p>No hay elementos en esta carpeta</p>
+                <button class="action-btn create-folder-btn">
+                    <i class="fas fa-folder-plus"></i> Crear carpeta
+                </button>
+            </div>
         </div>
     </main>
 

@@ -1,28 +1,42 @@
-<!-- perfil.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Perfil - Blog Dashboard</title>
+    <title>Titulo proyecto</title>
     <link rel="stylesheet" href="styles/dashboard.css">
     <link rel="stylesheet" href="styles/perfil.css">
     <link rel="stylesheet" href="styles/theme-styles.css">
+    <link rel="stylesheet" href="styles/header.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <!-- Header fijo -->
     <header class="fixed-header">
         <div class="header-blue">
-            <h2>Nombre proyecto</h2>
-        </div>
-        <button class="theme-toggle" id="themeToggle">
-            <i id="themeIcon" class="fas fa-moon"></i>
-        </button>
-        
-        <!-- Botón hamburguesa -->
-        <div class="menu-toggle" id="menuToggle">
-            <i class="fas fa-user"></i>
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="search-container">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Buscar...">
+                        <button id="searchButton">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-controls">
+                    <button class="theme-toggle" id="themeToggle">
+                        <i id="themeIcon" class="fas fa-moon"></i>
+                    </button>
+                    <button class="profile-toggle" id="profileToggle">
+                        <i class="fas fa-user"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -41,9 +55,6 @@
             </a>
         </div>
     </div>
-
-    <!-- Overlay para cuando el sidebar está abierto -->
-    <div class="overlay" id="overlay"></div>
 
     <!-- Contenido principal - Perfil de usuario -->
     <main class="main-content">
@@ -130,7 +141,7 @@
                 </div>
             </div>
             
-            <!-- Nuevo contenido profesional para la columna derecha -->
+            <!-- Columna derecha -->
             <div class="sidebar-content">
                 <!-- Sección de Contacto -->
                 <div class="sidebar-card" id="contact-section">
