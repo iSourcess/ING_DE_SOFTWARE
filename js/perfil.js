@@ -1,213 +1,250 @@
-// Elementos DOM
-const menuToggle = document.getElementById('menuToggle');
-const dropdownMenu = document.getElementById('dropdownMenu');
-const overlay = document.getElementById('overlay');
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon = document.getElementById('themeIcon');
-const changeAvatarBtn = document.querySelector('.change-avatar-btn');
-const profileButtons = document.querySelectorAll('.perfil-buttons .btn');
-const contactForm = document.querySelector('.contact-form');
+/**
+ * Profile page functionality
+ */
 
-// Inicialización
-document.addEventListener('DOMContentLoaded', () => {
-    initializeTheme();
-    initializeEventListeners();
-    
-    // Detector de cambios en localStorage para sincronización entre pestañas
-    window.addEventListener('storage', handleStorageChange);
+document.addEventListener('DOMContentLoaded', function() {
+    initializeProfile();
 });
 
-// Inicializar event listeners
-function initializeEventListeners() {
-    // Toggle menú hamburguesa
-    if (menuToggle) {
-        menuToggle.addEventListener('click', toggleDropdownMenu);
-    }
+function initializeProfile() {
+    // Initialize profile editing
+    initializeProfileEditing();
     
-    // Cerrar menú al hacer clic en overlay
-    if (overlay) {
-        overlay.addEventListener('click', closeDropdownMenu);
-    }
+    // Initialize profile image upload
+    initializeImageUpload();
     
-    // Toggle tema oscuro/claro
-    if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-    }
+    // Initialize activity chart
+    initializeActivityChart();
     
-    // Eventos para el botón de cambiar avatar
-    if (changeAvatarBtn) {
-        changeAvatarBtn.addEventListener('click', handleAvatarChange);
-    }
+    // Load recent activity
+    loadRecentActivity();
+}
+
+function initializeProfileEditing() {
+    const editInfoBtn = document.getElementById('edit-info');
+    const saveInfoBtn = document.getElementById('save-info');
+    const cancelEditBtn = document.getElementById('cancel-edit-info');
+    const infoForm = document.getElementById('info-form');
     
-    // Eventos para los botones del perfil
-    if (profileButtons) {
-        profileButtons.forEach(button => {
-            button.addEventListener('click', handleProfileButtonClick);
+    if (editInfoBtn && saveInfoBtn && cancelEditBtn && infoForm) {
+        // Store original form values
+        let originalValues = {};
+        
+        // Edit button click
+        editInfoBtn.addEventListener('click', function() {
+            // Store original values
+            const inputs = infoForm.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                originalValues[input.id] = input.value;
+                input.disabled = false;
+            });
+            
+            // Show save and cancel buttons, hide edit button
+            saveInfoBtn.style.display = 'block';
+            cancelEditBtn.style.display = 'block';
+            editInfoBtn.style.display = 'none';
+        });
+        
+        // Cancel button click
+        cancelEditBtn.addEventListener('click', function() {
+            // Restore original values
+            const inputs = infoForm.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.value = originalValues[input.id];
+                input.disabled = true;
+            });
+            
+            // Hide save and cancel buttons, show edit button
+            saveInfoBtn.style.display = 'none';
+            cancelEditBtn.style.display = 'none';
+            editInfoBtn.style.display = 'block';
+        });
+        
+        // Save button click
+        saveInfoBtn.addEventListener('click', function() {
+            // Update profile info
+            updateProfileInfo();
+            
+            // Disable inputs
+            const inputs = infoForm.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.disabled = true;
+            });
+            
+            // Hide save and cancel buttons, show edit button
+            saveInfoBtn.style.display = 'none';
+            cancelEditBtn.style.display = 'none';
+            editInfoBtn.style.display = 'block';
+            
+            // Show success notification
+            showNotification('Perfil actualizado correctamente', 'success');
         });
     }
+}
+
+function updateProfileInfo() {
+    // Get form values
+    const nombre = document.getElementById('nombre').value;
+    const apellido = document.getElementById('apellido').value;
+    const departamento = document.getElementById('departamento').value;
+    const posicion = document.getElementById('posicion').value;
     
-    // Evento para el formulario de contacto
-    if (contactForm) {
-        contactForm.addEventListener('submit', handleContactFormSubmit);
+    // Update profile info
+    const profileName = document.querySelector('.profile-name');
+    const profilePosition = document.querySelector('.profile-position');
+    const profileDepartment = document.querySelector('.profile-department');
+    
+    if (profileName && profilePosition && profileDepartment) {
+        profileName.textContent = `Dr. ${nombre} ${apellido}`;
+        profilePosition.textContent = posicion;
+        profileDepartment.textContent = departamento;
+    }
+    
+    // Update user menu
+    const userName = document.querySelector('.user-name');
+    if (userName) {
+        userName.textContent = `Dr. ${nombre} ${apellido}`;
     }
 }
 
-// Función para inicializar el tema
-function initializeTheme() {
-    const isDarkMode = localStorage.getItem('darkMode') === 'true';
-    applyTheme(isDarkMode);
-}
-
-// Aplicar el tema oscuro o claro
-function applyTheme(isDarkMode) {
-    if (isDarkMode) {
-        document.body.classList.add('dark-theme');
-        if (themeIcon) {
-            themeIcon.className = 'fas fa-sun';
-        }
-    } else {
-        document.body.classList.remove('dark-theme');
-        if (themeIcon) {
-            themeIcon.className = 'fas fa-moon';
-        }
+function initializeImageUpload() {
+    const uploadBtn = document.getElementById('upload-image-btn');
+    const profileImage = document.querySelector('.profile-image');
+    
+    if (uploadBtn && profileImage) {
+        uploadBtn.addEventListener('click', function() {
+            // In a real app, this would open a file picker
+            // For demo purposes, we'll just change the image
+            const randomId = Math.floor(Math.random() * 100);
+            profileImage.src = `https://randomuser.me/api/portraits/men/${randomId}.jpg`;
+            
+            // Update user menu avatar
+            const userAvatar = document.querySelector('.user-avatar');
+            if (userAvatar) {
+                userAvatar.src = profileImage.src;
+            }
+            
+            showNotification('Imagen de perfil actualizada', 'success');
+        });
     }
 }
 
-// Manejar cambios en el almacenamiento (para sincronización entre pestañas)
-function handleStorageChange(event) {
-    if (event.key === 'darkMode') {
-        const isDarkMode = event.newValue === 'true';
-        applyTheme(isDarkMode);
-    }
-}
-
-// Función para cambiar tema
-function toggleTheme() {
-    const isDarkMode = document.body.classList.toggle('dark-theme');
-    localStorage.setItem('darkMode', isDarkMode.toString());
+function initializeActivityChart() {
+    const ctx = document.getElementById('activityChart');
     
-    if (themeIcon) {
-        themeIcon.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
-    }
-}
-
-// Funciones para el menú desplegable
-function toggleDropdownMenu() {
-    dropdownMenu.classList.toggle('active');
-    overlay.classList.toggle('active');
-}
-
-function closeDropdownMenu() {
-    dropdownMenu.classList.remove('active');
-    overlay.classList.remove('active');
-}
-
-// Función para manejar el cambio de avatar
-function handleAvatarChange() {
-    // Crear un input de archivo oculto
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    
-    // Manejar la selección de archivo
-    fileInput.addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                // Actualizar la imagen de avatar
-                const avatarImages = document.querySelectorAll('.avatar, .avatar-large');
-                avatarImages.forEach(img => {
-                    img.src = e.target.result;
-                });
-                
-                // Aquí se podría añadir código para enviar la imagen al servidor
-                showNotification('Imagen de perfil actualizada');
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-    
-    // Simular clic en el input de archivo
-    fileInput.click();
-}
-
-// Función para manejar clics en botones del perfil
-function handleProfileButtonClick(event) {
-    const button = event.currentTarget;
-    const buttonText = button.textContent.trim();
-    
-    if (buttonText.includes('Editar Perfil')) {
-        // Lógica para editar perfil
-        showNotification('Editando perfil...');
-    } else if (buttonText.includes('Cambiar Contraseña')) {
-        // Lógica para cambiar contraseña
-        showNotification('Cambiando contraseña...');
-    } else if (buttonText.includes('Preferencias de Notificación')) {
-        // Lógica para preferencias de notificación
-        showNotification('Configurando notificaciones...');
-    }
-}
-
-// Función para manejar el envío del formulario de contacto
-function handleContactFormSubmit(event) {
-    event.preventDefault();
-    
-    // Obtener datos del formulario
-    const formData = new FormData(event.target);
-    const name = formData.get('contact-name');
-    const email = formData.get('contact-email');
-    const subject = formData.get('contact-subject');
-    const message = formData.get('contact-message');
-    
-    // Aquí se podría añadir código para enviar los datos al servidor
-    console.log('Formulario enviado:', { name, email, subject, message });
-    
-    // Mostrar notificación
-    showNotification('Mensaje enviado correctamente');
-    
-    // Resetear formulario
-    event.target.reset();
-}
-
-// Función para mostrar notificaciones al usuario
-function showNotification(message) {
-    // Crear elemento de notificación
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-    
-    // Estilos para la notificación
-    notification.style.position = 'fixed';
-    notification.style.bottom = '20px';
-    notification.style.right = '20px';
-    notification.style.backgroundColor = 'var(--primary-color)';
-    notification.style.color = 'white';
-    notification.style.padding = '12px 20px';
-    notification.style.borderRadius = '4px';
-    notification.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.2)';
-    notification.style.zIndex = '1000';
-    notification.style.opacity = '0';
-    notification.style.transform = 'translateY(20px)';
-    notification.style.transition = 'opacity 0.3s, transform 0.3s';
-    
-    // Añadir al DOM
-    document.body.appendChild(notification);
-    
-    // Mostrar con animación
-    setTimeout(() => {
-        notification.style.opacity = '1';
-        notification.style.transform = 'translateY(0)';
-    }, 10);
-    
-    // Ocultar después de 3 segundos
-    setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateY(20px)';
+    if (ctx) {
+        // Sample data
+        const data = {
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            datasets: [
+                {
+                    label: 'Documentos',
+                    data: [5, 3, 7, 4, 6, 8, 5, 3, 9, 6, 4, 7],
+                    backgroundColor: 'rgba(74, 111, 220, 0.2)',
+                    borderColor: 'rgba(74, 111, 220, 1)',
+                    borderWidth: 2,
+                    tension: 0.4
+                },
+                {
+                    label: 'Publicaciones',
+                    data: [2, 1, 0, 1, 3, 1, 0, 2, 1, 2, 1, 2],
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    tension: 0.4
+                }
+            ]
+        };
         
-        // Eliminar del DOM después de la animación
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
+        // Create chart
+        new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(200, 200, 200, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Actividad anual'
+                    }
+                }
+            }
+        });
+    }
+}
+
+function loadRecentActivity() {
+    const activityList = document.getElementById('activity-list');
+    
+    if (activityList) {
+        // Sample activities
+        const activities = [
+            {
+                icon: 'fa-file-alt',
+                title: 'Subiste un nuevo documento',
+                description: 'Programa de estudio - Matemáticas avanzadas',
+                time: '2 horas'
+            },
+            {
+                icon: 'fa-comment',
+                title: 'Comentaste en un documento',
+                description: 'Investigación sobre Machine Learning',
+                time: '1 día'
+            },
+            {
+                icon: 'fa-share-alt',
+                title: 'Compartiste un documento',
+                description: 'Conferencia: Inteligencia Artificial y Ética',
+                time: '2 días'
+            },
+            {
+                icon: 'fa-edit',
+                title: 'Editaste un documento',
+                description: 'Datos de investigación 2023',
+                time: '3 días'
+            },
+            {
+                icon: 'fa-folder-plus',
+                title: 'Creaste una nueva carpeta',
+                description: 'Artículos',
+                time: '1 semana'
+            }
+        ];
+        
+        // Add activities to list
+        activities.forEach(activity => {
+            const activityItem = document.createElement('div');
+            activityItem.className = 'activity-item';
+            
+            activityItem.innerHTML = `
+                <div class="activity-icon">
+                    <i class="fas ${activity.icon}"></i>
+                </div>
+                <div class="activity-details">
+                    <div class="activity-title">${activity.title}</div>
+                    <div class="activity-description">${activity.description}</div>
+                    <div class="activity-time">Hace ${activity.time}</div>
+                </div>
+            `;
+            
+            activityList.appendChild(activityItem);
+        });
+    }
 }

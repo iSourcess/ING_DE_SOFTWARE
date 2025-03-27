@@ -1,153 +1,170 @@
+import { auth, db } from '../src/firebase/config';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('registrationForm');
-    const progress = document.getElementById('formProgress');
-    const submitBtn = document.getElementById('submitBtn');
+    const registrationForm = document.getElementById('registrationForm');
+    const nombreInput = document.getElementById('nombre');
+    const apellidosInput = document.getElementById('apellidos');
+    const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmPassword');
-    const strengthMeter = document.getElementById('strengthMeter');
+    const submitBtn = document.getElementById('submitBtn');
     const strengthText = document.getElementById('strengthText');
+    const strengthMeter = document.getElementById('strengthMeter');
+    const formProgress = document.getElementById('formProgress');
 
-    // Función para validar el formato del correo institucional
+    // Actualizar barra de progreso
+    function updateProgressBar() {
+        const inputs = [nombreInput, apellidosInput, emailInput, passwordInput, confirmPasswordInput];
+        const filledInputs = inputs.filter(input => input.value.trim() !== '').length;
+        const progressPercentage = (filledInputs / inputs.length) * 100;
+        
+        formProgress.style.width = `${progressPercentage}%`;
+    }
+
+    // Calcular fuerza de contraseña
+    function calculatePasswordStrength(password) {
+        let strength = 0;
+        const strengthCriteria = [
+            password.length >= 8,           // Longitud
+            /[A-Z]/.test(password),         // Mayúsculas
+            /[a-z]/.test(password),         // Minúsculas
+            /\d/.test(password),            // Números
+            /[!@#$%^&*(),.?":{}|<>]/.test(password) // Caracteres especiales
+        ];
+
+        strength = strengthCriteria.filter(Boolean).length;
+
+        // Actualizar visualización de fuerza
+        strengthMeter.style.width = `${strength * 20}%`;
+        
+        switch(strength) {
+            case 0:
+            case 1:
+                strengthText.textContent = 'Muy débil';
+                strengthMeter.style.backgroundColor = 'red';
+                break;
+            case 2:
+            case 3:
+                strengthText.textContent = 'Débil';
+                strengthMeter.style.backgroundColor = 'orange';
+                break;
+            case 4:
+                strengthText.textContent = 'Moderada';
+                strengthMeter.style.backgroundColor = 'yellow';
+                break;
+            case 5:
+                strengthText.textContent = 'Fuerte';
+                strengthMeter.style.backgroundColor = 'green';
+                break;
+        }
+
+        return strength >= 3;
+    }
+
+    // Validar correo institucional
     function validateEmail(email) {
         const regex = /^[a-zA-Z]+\.[a-zA-Z]+@academicos\.udg\.mx$/;
         return regex.test(email);
     }
 
-    // Función para verificar la fortaleza de la contraseña
-    function checkPasswordStrength(password) {
-        let strength = 0;
-        const patterns = [
-            /[a-z]/, // minúsculas
-            /[A-Z]/, // mayúsculas
-            /[0-9]/, // números
-            /[^A-Za-z0-9]/, // caracteres especiales
-            /.{8,}/ // longitud mínima
-        ];
+    // Validaciones en tiempo real
+    [nombreInput, apellidosInput, emailInput, passwordInput, confirmPasswordInput].forEach(input => {
+        input.addEventListener('input', function() {
+            // Actualizar barra de progreso
+            updateProgressBar();
 
-        patterns.forEach(pattern => {
-            if (pattern.test(password)) strength++;
-        });
+            // Ocultar errores previos
+            const errorElement = document.getElementById(`${input.id}Error`);
+            if (errorElement) errorElement.style.display = 'none';
 
-        return strength;
-    }
-
-    // Actualizar el medidor de fortaleza de la contraseña
-    function updatePasswordStrength() {
-        const strength = checkPasswordStrength(passwordInput.value);
-        const percentage = (strength / 5) * 100;
-        
-        strengthMeter.style.width = `${percentage}%`;
-        
-        // Cambiar el color según la fortaleza
-        strengthMeter.style.background = 
-            strength <= 2 ? '#ff4444' :  // Rojo para débil
-            strength <= 3 ? '#ffa700' :  // Naranja para regular
-            strength <= 4 ? '#2196F3' :  // Azul para buena
-            '#00C851';                   // Verde para fuerte
-
-        // Actualizar el texto descriptivo
-        strengthText.textContent = 
-            strength <= 2 ? 'Débil' :
-            strength <= 3 ? 'Regular' :
-            strength <= 4 ? 'Buena' : 'Fuerte';
-    }
-
-    // Actualizar la barra de progreso del formulario
-    function updateFormProgress() {
-        const inputs = form.querySelectorAll('input[required]');
-        const totalInputs = inputs.length;
-        let filledInputs = 0;
-
-        inputs.forEach(input => {
-            if (input.value.trim() !== '') filledInputs++;
-        });
-
-        const percentage = (filledInputs / totalInputs) * 100;
-        progress.style.width = `${percentage}%`;
-        
-        // Validar si se pueden coincidir las contraseñas
-        const passwordsMatch = passwordInput.value === confirmPasswordInput.value;
-        
-        // Habilitar botón solo si todos los campos están llenos y las contraseñas coinciden
-        submitBtn.disabled = percentage !== 100 || !passwordsMatch;
-    }
-
-    document.getElementById("registrationForm").addEventListener("submit", function(event) {
-        const checkboxes = document.querySelectorAll("input[name='tipoProfesor']:checked");
-        const errorElement = document.getElementById("tipoProfesorError");
-        
-        if (checkboxes.length === 0) {
-            errorElement.style.display = "block";
-            event.preventDefault(); // Evitar el envío del formulario
-        } else {
-            errorElement.style.display = "none";
-        }
-    });
-    
-
-    // Validación en tiempo real de los campos
-    form.addEventListener('input', function(e) {
-        const input = e.target;
-        const errorElement = document.getElementById(`${input.id}Error`);
-
-        // Validaciones específicas por campo
-        switch(input.id) {
-            case 'email':
-                if (!validateEmail(input.value)) {
-                    errorElement.style.display = 'block';
-                } else {
-                    errorElement.style.display = 'none';
-                }
-                break;
-
-            case 'password':
-                updatePasswordStrength();
-                // Verificar coincidencia de contraseñas si ambos campos tienen valor
-                if (confirmPasswordInput.value) {
-                    const confirmError = document.getElementById('confirmPasswordError');
-                    confirmError.style.display = 
-                        passwordInput.value !== confirmPasswordInput.value ? 'block' : 'none';
-                }
-                break;
-
-            case 'confirmPassword':
-                const confirmError = document.getElementById('confirmPasswordError');
-                confirmError.style.display = 
-                    passwordInput.value !== confirmPasswordInput.value ? 'block' : 'none';
-                break;
-        }
-
-        updateFormProgress();
-    });
-
-    // Manejo del envío del formulario
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        try {
-            const response = await fetch('/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: document.getElementById('nombre').value,
-                    lastname: document.getElementById('apellidos').value,
-                    email: document.getElementById('email').value,
-                    password: document.getElementById('password').value
-                })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert('Registro exitoso! Por favor, inicia sesión.');
-                window.location.href = 'index.html';
-            } else {
-                alert(data.error || 'Error en el registro');
+            // Validaciones específicas
+            if (input === emailInput) {
+                const isValidEmail = validateEmail(input.value);
+                document.getElementById('emailError').style.display = isValidEmail ? 'none' : 'block';
             }
-        } catch (error) {
-            alert('Error al conectar con el servidor');
-        }
+
+            if (input === passwordInput) {
+                calculatePasswordStrength(input.value);
+                const isStrongPassword = calculatePasswordStrength(input.value);
+                document.getElementById('passwordError').style.display = isStrongPassword ? 'none' : 'block';
+            }
+
+            if (input === confirmPasswordInput) {
+                const passwordsMatch = passwordInput.value === confirmPasswordInput.value;
+                document.getElementById('confirmPasswordError').style.display = passwordsMatch ? 'none' : 'block';
+            }
+
+            // Habilitar/deshabilitar botón de submit
+            checkFormValidity();
+        });
     });
+
+    // Verificar validez del formulario
+    function checkFormValidity() {
+        const isNombreValid = nombreInput.value.trim() !== '';
+        const isApellidosValid = apellidosInput.value.trim() !== '';
+        const isEmailValid = validateEmail(emailInput.value);
+        const isPasswordStrong = calculatePasswordStrength(passwordInput.value);
+        const doPasswordsMatch = passwordInput.value === confirmPasswordInput.value;
+
+        submitBtn.disabled = !(isNombreValid && isApellidosValid && isEmailValid && isPasswordStrong && doPasswordsMatch);
+    }
+
+    // Inicializar barra de progreso
+    updateProgressBar();
+
+    // Manejar el envío del formulario
+    if (registrationForm) {
+        registrationForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            try {
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                const nombre = nombreInput.value;
+                const apellidos = apellidosInput.value;
+
+                // Crear usuario en Firebase Authentication
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Guardar información adicional en Firestore
+                await setDoc(doc(db, 'users', user.uid), {
+                    nombre: nombre,
+                    apellidos: apellidos,
+                    email: email,
+                    createdAt: new Date(),
+                    role: 'student' // Puedes añadir un rol por defecto
+                }, { merge: true }); // Usar merge para evitar sobreescribir datos
+
+                // Mostrar mensaje de éxito
+                alert('Registro exitoso');
+                
+                // Redirigir al inicio de sesión
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Error en el registro:', error);
+                
+                let errorMessage = 'Error en el registro';
+                
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'El correo ya está registrado';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Correo electrónico inválido';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'La contraseña es muy débil';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+
+                alert(errorMessage);
+            }
+        });
+    }
 });

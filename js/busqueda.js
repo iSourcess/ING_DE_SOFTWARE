@@ -1,353 +1,253 @@
-// Elementos DOM
-const searchInput = document.getElementById('search-input');
-const searchButton = document.getElementById('search-button');
-const filterDate = document.getElementById('filter-date');
-const filterYear = document.getElementById('filter-year');
-const currentCategory = document.getElementById('current-category');
-const clearCategory = document.getElementById('clear-category');
-const fileListContainer = document.querySelector('.file-list-container');
-const noResults = document.getElementById('no-results');
-const fileViewer = document.getElementById('file-viewer');
-const pdfFrame = document.getElementById('pdf-frame');
-const viewerTitle = document.getElementById('viewer-title');
-const toggleSidebar = document.getElementById('toggle-sidebar');
-const closeSidebar = document.getElementById('close-sidebar');
-const sidebar = document.querySelector('.sidebar');
-const themeToggle = document.getElementById('theme-toggle');
-const projectName = document.getElementById('project-name');
+/**
+ * Search page functionality
+ */
 
-// Datos de ejemplo (simulando PDFs con categorías y años)
-const pdfFiles = [
-    {
-        id: 1,
-        title: "Programa de estudio - Matemáticas avanzadas",
-        subtitle: "Semestre 2025-I",
-        content: "Programa académico detallado del curso de matemáticas avanzadas, incluyendo temario, bibliografía y cronograma de actividades.",
-        date: "2025-01-15",
-        year: "2025",
-        category: "docencia-programas",
-        categoryName: "Docencia - Programas académicos",
-        url: "docs/programa_matematicas_2025.pdf"
-    },
-];
-
-// Variables globales
-let currentFilter = {
-    search: '',
-    category: 'all',
-    year: 'all',
-    sort: 'newest'
-};
-
-// Inicialización
-window.addEventListener('DOMContentLoaded', () => {
-    renderPDFs(pdfFiles);
-    initializeEventListeners();
-    populateYearFilter();
-    
-    // Establecer nombre del proyecto (reemplazar con el nombre real del proyecto)
-    projectName.textContent = "Repositorio Académico";
-    
-    // Verificar preferencia de tema
-    initializeTheme();
-    
-    // Escuchar cambios en el localStorage (para sincronización entre pestañas)
-    window.addEventListener('storage', handleStorageChange);
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSearch();
 });
 
-// Inicializar event listeners
-function initializeEventListeners() {
-    // Búsqueda y filtros
-    searchButton.addEventListener('click', handleSearch);
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleSearch();
-    });
+function initializeSearch() {
+    // Initialize search form
+    initializeSearchForm();
     
-    filterDate.addEventListener('change', handleSortChange);
-    filterYear.addEventListener('change', handleYearChange);
-    clearCategory.addEventListener('click', clearCategoryFilter);
+    // Initialize filters
+    initializeFilters();
     
-    // Menú y submenús
-    const menuItems = document.querySelectorAll('.menu-item');
-    menuItems.forEach(item => {
-        item.addEventListener('click', toggleSubmenu);
-    });
+    // Initialize file viewer
+    initializeFileViewer();
+}
+
+function initializeSearchForm() {
+    const searchForm = document.getElementById('search-form');
+    const searchInput = document.getElementById('search-input');
     
-    // Enlaces de categoría
-    const categoryLinks = document.querySelectorAll('[data-category]');
-    categoryLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
+    if (searchForm && searchInput) {
+        searchForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const category = e.target.getAttribute('data-category');
-            applyCategory(category);
+            
+            const query = searchInput.value.trim();
+            if (query) {
+                performSearch(query);
+            }
         });
-    });
-    
-    // Botones de vista y descarga (delegación de eventos)
-    fileListContainer.addEventListener('click', (e) => {
-        if (e.target.closest('.view-button')) {
-            const card = e.target.closest('.file-card');
-            const fileId = parseInt(card.dataset.id);
-            openViewer(fileId);
-        } else if (e.target.closest('.download-button')) {
-            const card = e.target.closest('.file-card');
-            const fileId = parseInt(card.dataset.id);
-            downloadFile(fileId);
+    }
+}
+
+async function performSearch(query) {
+    const searchResults = document.getElementById('search-results');
+    if (!searchResults) return;
+
+    searchResults.innerHTML = '<div class="loading">Buscando...</div>';
+
+    // Obtener los valores de los filtros
+    const category = document.getElementById('filter-category').value;
+    const year = document.getElementById('filter-year').value;
+    const sortBy = document.getElementById('filter-sort').value;
+    const type = document.getElementById('filter-type').value;
+    const author = document.getElementById('filter-author').value;
+
+    try {
+        // Obtener los archivos del dashboard
+        const { files } = await getFolderContents(currentPath);
+        let matchingFiles = files.filter(file => {
+            // Aplicar filtros
+            const matchesQuery = query ? (
+                file.name.toLowerCase().includes(query.toLowerCase()) ||
+                file.description?.toLowerCase().includes(query.toLowerCase()) ||
+                file.author?.toLowerCase().includes(query.toLowerCase())
+            ) : true;
+
+            const matchesCategory = category === 'all' || file.category === category;
+            const matchesYear = year === 'all' || new Date(file.createdAt).getFullYear().toString() === year;
+            const matchesType = type === 'all' || file.type === type;
+            const matchesAuthor = author === 'all' || 
+                                (author === 'user' && file.author === currentUser) || 
+                                (author === 'shared' && file.author !== currentUser);
+
+            return matchesQuery && matchesCategory && matchesYear && matchesType && matchesAuthor;
+        });
+
+        // Ordenar resultados
+        matchingFiles.sort((a, b) => {
+            switch(sortBy) {
+                case 'newest':
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                case 'oldest':
+                    return new Date(a.createdAt) - new Date(b.createdAt);
+                case 'name-asc':
+                    return a.name.localeCompare(b.name);
+                case 'name-desc':
+                    return b.name.localeCompare(a.name);
+                default:
+                    return 0;
+            }
+        });
+
+        // Mostrar resultados
+        if (matchingFiles.length === 0) {
+            searchResults.innerHTML = '<div class="no-results">No se encontraron resultados para tu búsqueda.</div>';
+        } else {
+            searchResults.innerHTML = '';
+            matchingFiles.forEach(file => {
+                const fileCard = createFileCard(file);
+                searchResults.appendChild(fileCard);
+            });
         }
-    });
-    
-    // Visor de PDF
-    document.getElementById('close-viewer').addEventListener('click', closeViewer);
-    document.getElementById('download-viewing').addEventListener('click', () => {
-        const currentUrl = pdfFrame.src;
-        window.open(currentUrl, '_blank');
-    });
-    
-    // Toggle sidebar en móvil
-    toggleSidebar.addEventListener('click', () => {
-        sidebar.classList.add('active');
-    });
-    
-    closeSidebar.addEventListener('click', () => {
-        sidebar.classList.remove('active');
-    });
-    
-    // Toggle tema oscuro/claro
-    themeToggle.addEventListener('click', toggleTheme);
-}
 
-// Función para inicializar el tema
-function initializeTheme() {
-    const isDarkMode = localStorage.getItem('darkMode') === 'true';
-    applyTheme(isDarkMode);
-}
-
-// Función para aplicar el tema
-function applyTheme(isDarkMode) {
-    if (isDarkMode) {
-        document.body.classList.add('dark-theme');
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    } else {
-        document.body.classList.remove('dark-theme');
-        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        showNotification(`Búsqueda completada: ${matchingFiles.length} resultados encontrados`, 'info');
+    } catch (error) {
+        console.error('Error al buscar archivos:', error);
+        searchResults.innerHTML = '<div class="error">Error al buscar archivos. Por favor, intente nuevamente.</div>';
+        showNotification('Error al buscar archivos', 'error');
     }
 }
 
-// Manejar cambios en el almacenamiento (para sincronización entre pestañas)
-function handleStorageChange(event) {
-    if (event.key === 'darkMode') {
-        const isDarkMode = event.newValue === 'true';
-        applyTheme(isDarkMode);
-    }
-}
 
-// Función para renderizar PDFs
-function renderPDFs(files) {
-    fileListContainer.innerHTML = '';
+function initializeFilters() {
+    const filterCategory = document.getElementById('filter-category');
+    const filterYear = document.getElementById('filter-year');
+    const filterSort = document.getElementById('filter-sort');
     
-    if (files.length === 0) {
-        noResults.classList.remove('hidden');
-        return;
-    } else {
-        noResults.classList.add('hidden');
-    }
-    
-    files.forEach(file => {
-        const fileCard = document.createElement('div');
-        fileCard.className = 'file-card';
-        fileCard.dataset.id = file.id;
+    if (filterCategory && filterYear && filterSort) {
+        // Category filter
+        filterCategory.addEventListener('change', function() {
+            applyFilters();
+        });
         
-        const formattedDate = formatDate(file.date);
+        // Year filter
+        filterYear.addEventListener('change', function() {
+            applyFilters();
+        });
         
-        fileCard.innerHTML = `
-            <h2 class="file-title">${file.title}</h2>
-            <h3 class="file-subtitle">${file.subtitle}</h3>
-            <div class="file-date">Fecha: ${formattedDate}</div>
-            <div class="file-category">Categoría: ${file.categoryName}</div>
-            <div class="file-content">${file.content}</div>
-            <div class="file-actions">
-                <button class="view-button"><i class="fas fa-eye"></i> Ver</button>
-                <button class="download-button"><i class="fas fa-download"></i> Descargar</button>
-            </div>
-        `;
-        
-        fileListContainer.appendChild(fileCard);
-    });
-}
-
-// Función de búsqueda
-function handleSearch() {
-    const searchTerm = searchInput.value.trim().toLowerCase();
-    currentFilter.search = searchTerm;
-    applyFilters();
-}
-
-// Función para cambiar ordenamiento
-function handleSortChange() {
-    currentFilter.sort = filterDate.value;
-    applyFilters();
-}
-
-// Función para filtrar por año
-function handleYearChange() {
-    currentFilter.year = filterYear.value;
-    applyFilters();
-}
-
-// Función para aplicar filtros de categoría
-function applyCategory(category) {
-    currentFilter.category = category;
-    
-    // Actualizar UI para mostrar la categoría seleccionada
-    const categoryLinks = document.querySelectorAll('[data-category]');
-    const selectedLink = Array.from(categoryLinks).find(link => link.getAttribute('data-category') === category);
-    
-    if (selectedLink) {
-        currentCategory.querySelector('span').textContent = selectedLink.textContent;
-        clearCategory.classList.remove('hidden');
+        // Sort filter
+        filterSort.addEventListener('change', function() {
+            applyFilters();
+        });
     }
-    
-    // Cerrar sidebar en móvil
-    if (window.innerWidth <= 992) {
-        sidebar.classList.remove('active');
-    }
-    
-    applyFilters();
 }
 
-// Función para limpiar filtro de categoría
-function clearCategoryFilter() {
-    currentFilter.category = 'all';
-    currentCategory.querySelector('span').textContent = 'Todas las categorías';
-    clearCategory.classList.add('hidden');
-    applyFilters();
-}
+async function applyFilters() {
+    const searchResults = document.getElementById('search-results');
+    if (!searchResults) return;
 
-// Aplicar todos los filtros
-function applyFilters() {
-    let filteredFiles = [...pdfFiles];
-    
-    // Filtrar por término de búsqueda
-    if (currentFilter.search) {
-        filteredFiles = filteredFiles.filter(file => 
-            file.title.toLowerCase().includes(currentFilter.search) || 
-            file.subtitle.toLowerCase().includes(currentFilter.search) || 
-            file.content.toLowerCase().includes(currentFilter.search)
-        );
-    }
-    
-    // Filtrar por categoría
-    if (currentFilter.category !== 'all') {
-        filteredFiles = filteredFiles.filter(file => 
-            file.category === currentFilter.category
-        );
-    }
-    
-    // Filtrar por año
-    if (currentFilter.year !== 'all') {
-        filteredFiles = filteredFiles.filter(file => 
-            file.year === currentFilter.year
-        );
-    }
-    
-    // Ordenar resultados
-    switch (currentFilter.sort) {
-        case 'newest':
-            filteredFiles.sort((a, b) => new Date(b.date) - new Date(a.date));
-            break;
-        case 'oldest':
-            filteredFiles.sort((a, b) => new Date(a.date) - new Date(b.date));
-            break;
-        case 'name-asc':
-            filteredFiles.sort((a, b) => a.title.localeCompare(b.title));
-            break;
-        case 'name-desc':
-            filteredFiles.sort((a, b) => b.title.localeCompare(a.title));
-            break;
-    }
-    
-    renderPDFs(filteredFiles);
-}
+    searchResults.innerHTML = '<div class="loading">Aplicando filtros...</div>';
 
-// Función para abrir visor de PDF
-function openViewer(fileId) {
-    const file = pdfFiles.find(file => file.id === fileId);
-    if (!file) return;
-    
-    viewerTitle.textContent = file.title;
-    pdfFrame.src = file.url;
-    fileViewer.classList.remove('hidden');
-    document.body.style.overflow = 'hidden'; // Prevenir scroll
-}
+    const category = document.getElementById('filter-category').value;
+    const year = document.getElementById('filter-year').value;
+    const type = document.getElementById('filter-type').value;
+    const author = document.getElementById('filter-author').value;
+    const sortBy = document.getElementById('filter-sort').value;
 
-// Función para cerrar visor de PDF
-function closeViewer() {
-    fileViewer.classList.add('hidden');
-    pdfFrame.src = '';
-    document.body.style.overflow = ''; // Restaurar scroll
-}
+    try {
+        // Obtener los archivos del dashboard
+        const { files } = await getFolderContents(currentPath);
+        let matchingFiles = files.filter(file => {
+            const matchesCategory = category === 'all' || file.category === category;
+            const matchesYear = year === 'all' || new Date(file.createdAt).getFullYear().toString() === year;
+            const matchesType = type === 'all' || file.type === type;
+            const matchesAuthor = author === 'all' || 
+                                (author === 'user' && file.author === currentUser) || 
+                                (author === 'shared' && file.author !== currentUser);
 
-// Función para descargar archivo
-function downloadFile(fileId) {
-    const file = pdfFiles.find(file => file.id === fileId);
-    if (!file) return;
-    
-    // En un entorno real, se redireccionaría a la URL con atributos para descarga
-    window.open(file.url, '_blank');
-}
+            return matchesCategory && matchesYear && matchesType && matchesAuthor;
+        });
 
-// Función para formatear fecha
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-}
+        // Ordenar resultados
+        matchingFiles.sort((a, b) => {
+            switch(sortBy) {
+                case 'newest':
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                case 'oldest':
+                    return new Date(a.createdAt) - new Date(b.createdAt);
+                case 'name-asc':
+                    return a.name.localeCompare(b.name);
+                case 'name-desc':
+                    return b.name.localeCompare(a.name);
+                default:
+                    return 0;
+            }
+        });
 
-// Toggle menú/submenú
-function toggleSubmenu(e) {
-    const menuItem = e.currentTarget;
-    const parentLi = menuItem.parentElement;
-    
-    const isOpen = parentLi.classList.contains('open');
-    
-    // Cerrar todos los submenús abiertos
-    document.querySelectorAll('.main-menu > li.open').forEach(item => {
-        if (item !== parentLi) {
-            item.classList.remove('open');
+        // Mostrar resultados
+        if (matchingFiles.length === 0) {
+            searchResults.innerHTML = '<div class="no-results">No se encontraron resultados con los filtros seleccionados.</div>';
+        } else {
+            searchResults.innerHTML = '';
+            matchingFiles.forEach(file => {
+                const fileCard = createFileCard(file);
+                searchResults.appendChild(fileCard);
+            });
         }
-    });
-    
-    // Abrir/cerrar el submenú actual
-    parentLi.classList.toggle('open', !isOpen);
-}
 
-// Función para cambiar tema
-function toggleTheme() {
-    const isDarkMode = document.body.classList.toggle('dark-theme');
-    localStorage.setItem('darkMode', isDarkMode.toString());
-    
-    if (isDarkMode) {
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    } else {
-        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        showNotification(`Filtros aplicados: ${matchingFiles.length} resultados encontrados`, 'info');
+    } catch (error) {
+        console.error('Error al aplicar filtros:', error);
+        searchResults.innerHTML = '<div class="error">Error al aplicar filtros. Por favor, intente nuevamente.</div>';
+        showNotification('Error al aplicar filtros', 'error');
     }
 }
 
-// Función para poblar el filtro de años dinámicamente
-function populateYearFilter() {
-    const years = [...new Set(pdfFiles.map(file => file.year))].sort((a, b) => b - a);
+function initializeFileViewer() {
+    const fileViewer = document.getElementById('file-viewer');
+    const closeViewer = document.getElementById('close-viewer');
+    const viewerTitle = document.getElementById('viewer-title');
+    const pdfFrame = document.getElementById('pdf-frame');
+    const downloadBtn = document.getElementById('download-btn');
     
-    // Mantener la opción "Todos"
-    filterYear.innerHTML = '<option value="all">Todos</option>';
+    if (fileViewer && closeViewer) {
+        // Close viewer
+        closeViewer.addEventListener('click', function() {
+            fileViewer.style.display = 'none';
+        });
+        
+        // Download button
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', function() {
+                const fileName = viewerTitle.textContent;
+                showNotification(`Descargando: ${fileName}`, 'success');
+            });
+        }
+        
+        // View buttons
+        const viewButtons = document.querySelectorAll('.view-button');
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const fileId = this.getAttribute('data-id');
+                const fileCard = this.closest('.file-card');
+                const fileName = fileCard.querySelector('.file-title').textContent;
+                
+                openFileViewer(fileId, fileName);
+            });
+        });
+        
+        // Download buttons
+        const downloadButtons = document.querySelectorAll('.download-button');
+        downloadButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const fileId = this.getAttribute('data-id');
+                const fileCard = this.closest('.file-card');
+                const fileName = fileCard.querySelector('.file-title').textContent;
+                
+                showNotification(`Descargando: ${fileName}`, 'success');
+            });
+        });
+    }
+}
+
+function openFileViewer(fileId, fileName) {
+    const fileViewer = document.getElementById('file-viewer');
+    const viewerTitle = document.getElementById('viewer-title');
+    const pdfFrame = document.getElementById('pdf-frame');
     
-    // Agregar opciones de años
-    years.forEach(year => {
-        const option = document.createElement('option');
-        option.value = year;
-        option.textContent = year;
-        filterYear.appendChild(option);
-    });
+    if (fileViewer && viewerTitle && pdfFrame) {
+        // Set viewer title
+        viewerTitle.textContent = fileName;
+        
+        // Set PDF source based on file ID
+        // In a real app, this would load the actual file
+        pdfFrame.src = `https://via.placeholder.com/800x1000/ffffff/000000?text=Preview+of+${encodeURIComponent(fileName)}`;
+        
+        // Show viewer
+        fileViewer.style.display = 'flex';
+    }
 }

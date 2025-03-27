@@ -3,198 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador de PDFs</title>
+    <title>Búsqueda - Sistema de Gestión Académica</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/busqueda.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="layout-container">
-        <!-- Sidebar con menú de navegación -->
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <h2>Categorías</h2>
-                <button id="close-sidebar" class="mobile-only">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="menu-container">
-                <ul class="main-menu">
-                    <li>
-                        <div class="menu-item">
-                            <a href="#section1">Docencia</a>
-                            <i class="fas fa-chevron-down toggle-submenu"></i>
-                        </div>
-                        <ul class="submenu">
-                            <li><a href="#docencia-1" data-category="docencia-cursos">Cursos impartidos</a></li>
-                            <li><a href="#docencia-2" data-category="docencia-material">Material didáctico</a></li>
-                            <li><a href="#docencia-3" data-category="docencia-evaluaciones">Evaluaciones</a></li>
-                            <li><a href="#docencia-4" data-category="docencia-programas">Programas académicos</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <div class="menu-item">
-                            <a href="#section2">Investigación</a>
-                            <i class="fas fa-chevron-down toggle-submenu"></i>
-                        </div>
-                        <ul class="submenu">
-                            <li><a href="#investigacion-1" data-category="investigacion-proyectos">Proyectos actuales</a></li>
-                            <li><a href="#investigacion-2" data-category="investigacion-publicaciones">Publicaciones</a></li>
-                            <li><a href="#investigacion-3" data-category="investigacion-colaboraciones">Colaboraciones</a></li>
-                            <li><a href="#investigacion-4" data-category="investigacion-financiamiento">Financiamiento</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <div class="menu-item">
-                            <a href="#section3">Extensión y difusión</a>
-                            <i class="fas fa-chevron-down toggle-submenu"></i>
-                        </div>
-                        <ul class="submenu">
-                            <li><a href="#extension-1" data-category="extension-conferencias">Conferencias</a></li>
-                            <li><a href="#extension-2" data-category="extension-talleres">Talleres</a></li>
-                            <li><a href="#extension-3" data-category="extension-eventos">Eventos públicos</a></li>
-                            <li><a href="#extension-4" data-category="extension-medios">Medios de comunicación</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <div class="menu-item">
-                            <a href="#section4">Artículos científicos</a>
-                            <i class="fas fa-chevron-down toggle-submenu"></i>
-                        </div>
-                        <ul class="submenu">
-                            <li><a href="#articulos-1" data-category="articulos-publicados">Publicados</a></li>
-                            <li><a href="#articulos-2" data-category="articulos-revision">En revisión</a></li>
-                            <li><a href="#articulos-3" data-category="articulos-preparacion">En preparación</a></li>
-                            <li><a href="#articulos-4" data-category="articulos-colaboraciones">Colaboraciones</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <div class="menu-item">
-                            <a href="#seccion5">Tutorías</a>
-                            <i class="fas fa-chevron-down toggle-submenu"></i>
-                        </div>
-                        <ul class="submenu">
-                            <li><a href="#tutorias-1" data-category="tutorias-actuales">Estudiantes actuales</a></li>
-                            <li><a href="#tutorias-2" data-category="tutorias-graduados">Graduados</a></li>
-                            <li><a href="#tutorias-3" data-category="tutorias-tesis">Proyectos de tesis</a></li>
-                            <li><a href="#tutorias-4" data-category="tutorias-asesorias">Asesorías</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <div class="menu-item">
-                            <a href="#seccion6">Gestión</a>
-                            <i class="fas fa-chevron-down toggle-submenu"></i>
-                        </div>
-                        <ul class="submenu">
-                            <li><a href="#gestion-1" data-category="gestion-comites">Comités</a></li>
-                            <li><a href="#gestion-2" data-category="gestion-coordinacion">Coordinación</a></li>
-                            <li><a href="#gestion-3" data-category="gestion-proyectos">Proyectos administrativos</a></li>
-                            <li><a href="#gestion-4" data-category="gestion-informes">Informes</a></li>
-                        </ul>
-                    </li>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Sistema Académico</div>
+            <button class="close-sidebar" id="close-sidebar"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <div class="nav-icon"><i class="fas fa-home"></i></div>
+                    <div class="nav-text">Inicio</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link menu-item">
+                    <div class="nav-icon"><i class="fas fa-folder"></i></div>
+                    <div class="nav-text">Docencia</div>
+                    <div class="submenu-toggle"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="nav-link" data-category="docencia-programas">Programas académicos</a></li>
+                    <li><a href="#" class="nav-link" data-category="docencia-material">Material didáctico</a></li>
+                    <li><a href="#" class="nav-link" data-category="docencia-evaluaciones">Evaluaciones</a></li>
                 </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link menu-item">
+                    <div class="nav-icon"><i class="fas fa-flask"></i></div>
+                    <div class="nav-text">Investigación</div>
+                    <div class="submenu-toggle"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="nav-link" data-category="investigacion-proyectos">Proyectos actuales</a></li>
+                    <li><a href="#" class="nav-link" data-category="investigacion-publicaciones">Publicaciones</a></li>
+                    <li><a href="#" class="nav-link" data-category="investigacion-colaboraciones">Colaboraciones</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link menu-item">
+                    <div class="nav-icon"><i class="fas fa-users"></i></div>
+                    <div class="nav-text">Extensión</div>
+                    <div class="submenu-toggle"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="nav-link" data-category="extension-conferencias">Conferencias</a></li>
+                    <li><a href="#" class="nav-link" data-category="extension-talleres">Talleres</a></li>
+                    <li><a href="#" class="nav-link" data-category="extension-eventos">Eventos públicos</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link menu-item">
+                    <div class="nav-icon"><i class="fas fa-book"></i></div>
+                    <div class="nav-text">Artículos científicos</div>
+                    <div class="submenu-toggle"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="nav-link" data-category="articulos-borradores">Borradores</a></li>
+                    <li><a href="#" class="nav-link" data-category="articulos-revision">En revisión</a></li>
+                    <li><a href="#" class="nav-link" data-category="articulos-publicados">Publicados</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link menu-item">
+                    <div class="nav-icon"><i class="fas fa-user-graduate"></i></div>
+                    <div class="nav-text">Tutorías</div>
+                    <div class="submenu-toggle"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="nav-link" data-category="tutorias-tesis">Proyectos de tesis</a></li>
+                    <li><a href="#" class="nav-link" data-category="tutorias-practicas">Prácticas profesionales</a></li>
+                    <li><a href="#" class="nav-link" data-category="tutorias-servicio">Servicio social</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link menu-item">
+                    <div class="nav-icon"><i class="fas fa-tasks"></i></div>
+                    <div class="nav-text">Gestión</div>
+                    <div class="submenu-toggle">                    <div class="nav-icon"><i class="fas fa-tasks"></i></div>
+                    <div class="nav-text">Gestión</div>
+                    <div class="submenu-toggle"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="nav-link" data-category="gestion-informes">Informes</a></li>
+                    <li><a href="#" class="nav-link" data-category="gestion-reuniones">Reuniones</a></li>
+                    <li><a href="#" class="nav-link" data-category="gestion-comisiones">Comisiones</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="busqueda.html" class="nav-link active">
+                    <div class="nav-icon"><i class="fas fa-search"></i></div>
+                    <div class="nav-text">Búsqueda</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="perfil.html" class="nav-link">
+                    <div class="nav-icon"><i class="fas fa-user"></i></div>
+                    <div class="nav-text">Mi perfil</div>
+                </a>
+            </li>
+        </ul>
+        
+        <div class="sidebar-footer">
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon" id="themeIcon"></i>
+                <span>Cambiar tema</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-title">Búsqueda</div>
             </div>
-        </nav>
-
-        <!-- Contenido principal -->
-        <div class="main-content">
-            <header>
-                <div class="header-left">
-                    <button id="toggle-sidebar" class="mobile-only">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h1 id="project-name">Nombre proyecto</h1>
+            
+            <div class="header-right">
+                <button class="header-icon" id="notification-toggle">
+                    <i class="fas fa-bell"></i>
+                    <div class="notification-count" id="notification-count">3</div>
+                </button>
+                
+                <div class="notification-panel" id="notification-panel">
+                    <div class="notification-header">
+                        <div class="notification-title">Notificaciones</div>
+                        <button class="mark-all-read">Marcar todo como leído</button>
+                    </div>
+                    <div class="notification-list" id="notification-list">
+                        <!-- Notifications will be added here -->
+                    </div>
+                    <div class="notification-footer">
+                        <a href="#" class="view-all">Ver todas</a>
+                    </div>
                 </div>
-                <div class="header-controls">
-                    <button id="theme-toggle" aria-label="Cambiar tema">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                    <button id="user-profile" aria-label="Perfil de usuario">
-                        <i class="fas fa-user"></i>
-                    </button>
-                </div>
-            </header>
-
-            <div class="search-container">
-                <div class="search-box">
-                    <input type="text" id="search-input" placeholder="Buscar...">
-                    <button id="search-button">
-                        <i class="fas fa-search"></i>
-                    </button>
+                
+                <div class="user-menu">
+                    <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User" class="user-avatar">
+                    <div class="user-name">Dr. Juan Pérez</div>
                 </div>
             </div>
+        </header>
+        
+        <!-- Search Content -->
+        <div class="search-container">
+            <div class="search-header">
+                <h1 class="search-title">Búsqueda de documentos</h1>
+            </div>
+            
+            <form class="search-form" id="search-form">
+                <div class="search-input-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="search-input" placeholder="Buscar por título, autor, contenido...">
+                </div>
+                <button type="submit" class="search-button">Buscar</button>
+            </form>
+            
+            <div class="filter-container">
+                <div class="filter-group">
+                    <div class="filter-label">Categoría:</div>
+                    <select class="filter-select" id="filter-category">
+                        <option value="all">Todas</option>
+                        <option value="docencia">Docencia</option>
+                        <option value="investigacion">Investigación</option>
+                        <option value="extension">Extensión</option>
+                        <option value="articulos">Artículos</option>
+                        <option value="tutorias">Tutorías</option>
+                        <option value="gestion">Gestión</option>
+                    </select>
+                </div>
 
-            <div class="filters-container">
-                <div class="active-category" id="current-category">
-                    <span>Todas las categorías</span>
-                    <button id="clear-category" class="hidden">
-                        <i class="fas fa-times"></i>
-                    </button>
+                <div class="filter-group">
+                    <div class="filter-label">Tipo de documento:</div>
+                    <select class="filter-select" id="filter-type">
+                        <option value="all">Todos</option>
+                        <option value="pdf">PDF</option>
+                        <option value="doc">Word</option>
+                        <option value="ppt">PowerPoint</option>
+                        <option value="xls">Excel</option>
+                        <option value="txt">Texto</option>
+                    </select>
                 </div>
                 
                 <div class="filter-group">
-                    <label for="filter-date">Ordenar por:</label>
-                    <select id="filter-date">
-                        <option value="newest">Más reciente</option>
-                        <option value="oldest">Más antiguo</option>
+                    <div class="filter-label">Año:</div>
+                    <select class="filter-select" id="filter-year">
+                        <option value="all">Todos</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                        <option value="2020">2020</option>
+                        <option value="2019">2019</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">Autor:</div>
+                    <select class="filter-select" id="filter-author">
+                        <option value="all">Todos</option>
+                        <option value="user">Mis documentos</option>
+                        <option value="shared">Compartidos conmigo</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <div class="filter-label">Ordenar por:</div>
+                    <select class="filter-select" id="filter-sort">
+                        <option value="newest">Más recientes</option>
+                        <option value="oldest">Más antiguos</option>
                         <option value="name-asc">Nombre (A-Z)</option>
                         <option value="name-desc">Nombre (Z-A)</option>
                     </select>
                 </div>
+            </div>
+            
+            <div class="file-list-container" id="search-results">
+                <!-- Search results will be added here -->
+                <div class="file-card">
+                    <div class="file-title">Programa de estudio - Matemáticas avanzadas</div>
+                    <div class="file-subtitle">Departamento de Matemáticas</div>
+                    <div class="file-date">Actualizado: 15/01/2023</div>
+                    <div class="file-category">Categoría: Docencia</div>
+                    <div class="file-content">
+                        Este documento contiene el programa de estudio para el curso de Matemáticas Avanzadas del semestre 2023A, incluyendo objetivos, temario, metodología, evaluación y bibliografía.
+                    </div>
+                    <div class="file-actions">
+                        <button class="view-button" data-id="1"><i class="fas fa-eye"></i> Ver</button>
+                        <button class="download-button" data-id="1"><i class="fas fa-download"></i> Descargar</button>
+                    </div>
+                </div>
                 
-                <div class="filter-group">
-                    <label for="filter-year">Año:</label>
-                    <select id="filter-year">
-                        <option value="all">Todos</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
-                        <option value="2021">2021</option>
-                    </select>
+                <div class="file-card">
+                    <div class="file-title">Investigación sobre Machine Learning</div>
+                    <div class="file-subtitle">Grupo de Investigación en IA</div>
+                    <div class="file-date">Actualizado: 10/12/2022</div>
+                    <div class="file-category">Categoría: Investigación</div>
+                    <div class="file-content">
+                        Documento de investigación sobre aplicaciones de Machine Learning en el procesamiento de lenguaje natural, con énfasis en modelos transformers y su aplicación en el análisis de textos académicos.
+                    </div>
+                    <div class="file-actions">
+                        <button class="view-button" data-id="2"><i class="fas fa-eye"></i> Ver</button>
+                        <button class="download-button" data-id="2"><i class="fas fa-download"></i> Descargar</button>
+                    </div>
+                </div>
+                
+                <div class="file-card">
+                    <div class="file-title">Conferencia: Inteligencia Artificial y Ética</div>
+                    <div class="file-subtitle">Semana de la Ciencia 2023</div>
+                    <div class="file-date">Actualizado: 05/03/2023</div>
+                    <div class="file-category">Categoría: Extensión</div>
+                    <div class="file-content">
+                        Presentación para la conferencia sobre los dilemas éticos en el desarrollo y aplicación de sistemas de Inteligencia Artificial, con casos de estudio y recomendaciones para un desarrollo responsable.
+                    </div>
+                    <div class="file-actions">
+                        <button class="view-button" data-id="3"><i class="fas fa-eye"></i> Ver</button>
+                        <button class="download-button" data-id="3"><i class="fas fa-download"></i> Descargar</button>
+                    </div>
                 </div>
             </div>
-
-            <main>
-                <div class="file-list-container">
-                    <div class="loop-indicator">{% for post in posts %}</div>
-                    
-                    <div class="file-card">
-                        <h2 class="file-title">{{ post.title }}</h2>
-                        <h3 class="file-subtitle">{{ post.subtitle }}</h3>
-                        <div class="file-date">Post date {{ post.post_date.strftime('%d/%m/%Y') }}</div>
-                        <div class="file-category">Categoría: {{ post.category }}</div>
-                        <div class="file-content">{{ post.content }}</div>
-                        <div class="file-actions">
-                            <button class="view-button"><i class="fas fa-eye"></i> Ver</button>
-                            <button class="download-button"><i class="fas fa-download"></i> Descargar</button>
-                        </div>
-                    </div>
-                    
-                    <div class="loop-end-indicator">{% endfor %}</div>
-                </div>
-
-                <div id="no-results" class="hidden">
-                    <p>No se encontraron resultados para tu búsqueda.</p>
-                </div>
-
-                <div id="file-viewer" class="hidden">
-                    <div class="viewer-header">
-                        <h2 id="viewer-title"></h2>
-                        <div class="viewer-controls">
-                            <button id="download-viewing"><i class="fas fa-download"></i></button>
-                            <button id="close-viewer"><i class="fas fa-times"></i></button>
-                        </div>
-                    </div>
-                    <iframe id="pdf-frame" src=""></iframe>
-                </div>
-            </main>
-
-            <footer>
-                <p>&copy; 2025 Buscador de PDFs | Todos los derechos reservados</p>
-            </footer>
         </div>
     </div>
-
+    
+    <!-- File Viewer -->
+    <div class="file-viewer" id="file-viewer">
+        <div class="viewer-header">
+            <h3 class="viewer-title" id="viewer-title">Nombre del documento</h3>
+            <div class="viewer-actions">
+                <button class="viewer-button" id="download-btn"><i class="fas fa-download"></i></button>
+                <button class="viewer-button" id="close-viewer"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div class="viewer-content">
+            <iframe id="pdf-frame" class="pdf-frame" src=""></iframe>
+        </div>
+    </div>
+    
+    <script src="js/common.js"></script>
+    <script src="js/fileManager.js"></script>
+    <script src="js/fileCard.js"></script>
     <script src="js/busqueda.js"></script>
 </body>
 </html>

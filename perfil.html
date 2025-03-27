@@ -3,267 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Titulo proyecto</title>
-    <link rel="stylesheet" href="styles/dashboard.css">
+    <title>Mi Perfil - Sistema de Gestión Académica</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/perfil.css">
-    <link rel="stylesheet" href="styles/theme-styles.css">
-    <link rel="stylesheet" href="styles/header.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- Header fijo -->
-    <header class="fixed-header">
-        <div class="header-blue">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Sistema Académico</div>
+            <button class="close-sidebar" id="close-sidebar"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <div class="nav-icon"><i class="fas fa-home"></i></div>
+                    <div class="nav-text">Inicio</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link menu-item">
+                    <div class="nav-icon"><i class="fas fa-folder"></i></div>
+                    <div class="nav-text">Docencia</div>
+                    <div class="submenu-toggle"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="nav-link" data-category="docencia-programas">Programas académicos</a></li>
+                    <li><a href="#" class="nav-link" data-category="docencia-material">Material didáctico</a></li>
+                    <li><a href="#" class="nav-link" data-category="docencia-evaluaciones">Evaluaciones</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link menu-item">
+                    <div class="nav-icon"><i class="fas fa-flask"></i></div>
+                    <div class="nav-text">Investigación</div>
+                    <div class="submenu-toggle"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="nav-link" data-category="investigacion-proyectos">Proyectos actuales</a></li>
+                    <li><a href="#" class="nav-link" data-category="investigacion-publicaciones">Publicaciones</a></li>
+                    <li><a href="#" class="nav-link" data-category="investigacion-colaboraciones">Colaboraciones</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link menu-item">
+                    <div class="nav-icon"><i class="fas fa-users"></i></div>
+                    <div class="nav-text">Extensión</div>
+                    <div class="submenu-toggle"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="nav-link" data-category="extension-conferencias">Conferencias</a></li>
+                    <li><a href="#" class="nav-link" data-category="extension-talleres">Talleres</a></li>
+                    <li><a href="#" class="nav-link" data-category="extension-eventos">Eventos públicos</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link menu-item">
+                    <div class="nav-icon"><i class="fas fa-book"></i></div>
+                    <div class="nav-text">Artículos científicos</div>
+                    <div class="submenu-toggle"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="nav-link" data-category="articulos-borradores">Borradores</a></li>
+                    <li><a href="#" class="nav-link" data-category="articulos-revision">En revisión</a></li>
+                    <li><a href="#" class="nav-link" data-category="articulos-publicados">Publicados</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link menu-item">
+                    <div class="nav-icon"><i class="fas fa-user-graduate"></i></div>
+                    <div class="nav-text">Tutorías</div>
+                    <div class="submenu-toggle"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="nav-link" data-category="tutorias-tesis">Proyectos de tesis</a></li>
+                    <li><a href="#" class="nav-link" data-category="tutorias-practicas">Prácticas profesionales</a></li>
+                    <li><a href="#" class="nav-link" data-category="tutorias-servicio">Servicio social</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link menu-item">
+                    <div class="nav-icon"><i class="fas fa-tasks"></i></div>
+                    <div class="nav-icon"><i class="fas fa-tasks"></i></div>
+                    <div class="nav-text">Gestión</div>
+                    <div class="submenu-toggle"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="nav-link" data-category="gestion-informes">Informes</a></li>
+                    <li><a href="#" class="nav-link" data-category="gestion-reuniones">Reuniones</a></li>
+                    <li><a href="#" class="nav-link" data-category="gestion-comisiones">Comisiones</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="busqueda.html" class="nav-link">
+                    <div class="nav-icon"><i class="fas fa-search"></i></div>
+                    <div class="nav-text">Búsqueda</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="perfil.html" class="nav-link active">
+                    <div class="nav-icon"><i class="fas fa-user"></i></div>
+                    <div class="nav-text">Mi perfil</div>
+                </a>
+            </li>
+        </ul>
+        
+        <div class="sidebar-footer">
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon" id="themeIcon"></i>
+                <span>Cambiar tema</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
             <div class="header-left">
                 <button class="menu-toggle" id="menuToggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <div class="search-container">
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Buscar...">
-                        <button id="searchButton">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="header-right">
-                <div class="header-controls">
-                    <button class="theme-toggle" id="themeToggle">
-                        <i id="themeIcon" class="fas fa-moon"></i>
-                    </button>
-                    <button class="profile-toggle" id="profileToggle">
-                        <i class="fas fa-user"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Menú desplegable (hamburguesa) con solo info de usuario -->
-    <div class="dropdown-menu" id="dropdownMenu">
-        <div class="user-info">
-            <img src="icons/avatar.svg" alt="User Avatar" class="avatar">
-            <span>{{ current_user.name }}</span>
-        </div>
-        <div class="menu-items">
-            <a href="{{ url_for('perfil') }}"><i class="fas fa-user-circle"></i> Mi Perfil</a>
-            <a href="{{ url_for('settings') }}"><i class="fas fa-cog"></i> Configuración</a>
-            <a href="{{ url_for('help') }}"><i class="fas fa-question-circle"></i> Ayuda</a>
-            <a href="{{ url_for('logout') }}" class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-            </a>
-        </div>
-    </div>
-
-    <!-- Contenido principal - Perfil de usuario -->
-    <main class="main-content">
-        <div class="container perfil-container">
-            <div class="perfil-card">
-                <div class="perfil-header">
-                    <div class="perfil-avatar">
-                        <img src="icons/avatar.svg" alt="User Avatar" class="avatar-large">
-                        <button class="change-avatar-btn"><i class="fas fa-camera"></i></button>
-                    </div>
-                    <div class="perfil-info">
-                        <h1>{{ current_user.name }}</h1>
-                        <p class="perfil-subtitle">{{ current_user.role }}</p>
-                    </div>
-                </div>
-                
-                <div class="perfil-content">
-                    <div class="perfil-section">
-                        <h2><i class="fas fa-info-circle"></i> Información Personal</h2>
-                        <div class="perfil-data">
-                            <div class="data-row">
-                                <div class="data-label">Nombre completo:</div>
-                                <div class="data-value">{{ current_user.name }}</div>
-                            </div>
-                            <div class="data-row">
-                                <div class="data-label">Email:</div>
-                                <div class="data-value">{{ current_user.email }}</div>
-                            </div>
-                            <div class="data-row">
-                                <div class="data-label">Teléfono:</div>
-                                <div class="data-value">{{ current_user.phone }}</div>
-                            </div>
-                            <div class="data-row">
-                                <div class="data-label">Departamento:</div>
-                                <div class="data-value">{{ current_user.department }}</div>
-                            </div>
-                            <div class="data-row">
-                                <div class="data-label">Cargo:</div>
-                                <div class="data-value">{{ current_user.position }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="perfil-section">
-                        <h2><i class="fas fa-cog"></i> Configuración de Cuenta</h2>
-                        <div class="perfil-buttons">
-                            <button class="btn primary-btn"><i class="fas fa-edit"></i> Editar Perfil</button>
-                            <button class="btn secondary-btn"><i class="fas fa-key"></i> Cambiar Contraseña</button>
-                            <button class="btn secondary-btn"><i class="fas fa-bell"></i> Preferencias de Notificación</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Nueva sección de actividad reciente -->
-                    <div class="perfil-section">
-                        <h2><i class="fas fa-chart-line"></i> Actividad Reciente</h2>
-                        <div class="activity-timeline">
-                            <div class="activity-item">
-                                <div class="activity-icon"><i class="fas fa-file-alt"></i></div>
-                                <div class="activity-details">
-                                    <div class="activity-title">Documento actualizado</div>
-                                    <div class="activity-time">Hace 2 horas</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon"><i class="fas fa-comment"></i></div>
-                                <div class="activity-details">
-                                    <div class="activity-title">Comentario en proyecto</div>
-                                    <div class="activity-time">Ayer</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon"><i class="fas fa-tasks"></i></div>
-                                <div class="activity-details">
-                                    <div class="activity-title">Tarea completada</div>
-                                    <div class="activity-time">Hace 3 días</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="perfil-footer">
-                        <a href="{{ url_for('dashboard') }}" class="btn back-btn"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
-                    </div>
-                </div>
+                <div class="header-title">Mi Perfil</div>
             </div>
             
-            <!-- Columna derecha -->
-            <div class="sidebar-content">
-                <!-- Sección de Contacto -->
-                <div class="sidebar-card" id="contact-section">
-                    <div class="sidebar-card-header">
-                        <h3><i class="fas fa-envelope"></i> Contáctanos</h3>
+            <div class="header-right">
+                <button class="header-icon" id="notification-toggle">
+                    <i class="fas fa-bell"></i>
+                    <div class="notification-count" id="notification-count">3</div>
+                </button>
+                
+                <div class="notification-panel" id="notification-panel">
+                    <div class="notification-header">
+                        <div class="notification-title">Notificaciones</div>
+                        <button class="mark-all-read">Marcar todo como leído</button>
                     </div>
-                    <div class="sidebar-card-content">
-                        <form class="contact-form">
+                    <div class="notification-list" id="notification-list">
+                        <!-- Notifications will be added here -->
+                    </div>
+                    <div class="notification-footer">
+                        <a href="#" class="view-all">Ver todas</a>
+                    </div>
+                </div>
+                
+                <div class="user-menu">
+                    <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User" class="user-avatar">
+                    <div class="user-name">Dr. Juan Pérez</div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Profile Content -->
+        <div class="profile-container">
+            <div class="profile-header">
+                <h1 class="profile-title">Mi Perfil</h1>
+            </div>
+            
+            <div class="profile-content">
+                <div class="profile-sidebar">
+                    <div class="profile-image-container">
+                        <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="Profile" class="profile-image">
+                        <button class="upload-image-btn" id="upload-image-btn">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="profile-info">
+                        <div class="profile-name">Dr. Juan Pérez</div>
+                        <div class="profile-position">Profesor Investigador</div>
+                        <div class="profile-department">Facultad de Ciencias</div>
+                    </div>
+                    
+                    <div class="profile-contact">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>juan.perez@universidad.edu</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span>+52 123 456 7890</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-building"></i>
+                            <span>Edificio A, Oficina 305</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Horario: Lun-Vie 9:00-17:00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-main">
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <div class="section-title">Información personal</div>
+                            <div class="section-actions">
+                                <button class="btn btn-secondary" id="cancel-edit-info" style="display: none;">Cancelar</button>
+                                <button class="btn btn-primary" id="save-info" style="display: none;">Guardar</button>
+                                <button class="btn btn-primary" id="edit-info">Editar</button>
+                            </div>
+                        </div>
+                        
+                        <form class="profile-form" id="info-form">
                             <div class="form-group">
-                                <label for="contact-name">Nombre</label>
-                                <input type="text" id="contact-name" placeholder="Tu nombre">
+                                <label for="nombre">Nombre</label>
+                                <input type="text" id="nombre" value="Juan" disabled>
                             </div>
                             <div class="form-group">
-                                <label for="contact-email">Email</label>
-                                <input type="email" id="contact-email" placeholder="tu@email.com">
+                                <label for="apellido">Apellido</label>
+                                <input type="text" id="apellido" value="Pérez" disabled>
                             </div>
                             <div class="form-group">
-                                <label for="contact-subject">Asunto</label>
-                                <input type="text" id="contact-subject" placeholder="Asunto">
+                                <label for="email">Correo electrónico</label>
+                                <input type="email" id="email" value="juan.perez@universidad.edu" disabled>
                             </div>
                             <div class="form-group">
-                                <label for="contact-message">Mensaje</label>
-                                <textarea id="contact-message" rows="4" placeholder="Tu mensaje"></textarea>
+                                <label for="telefono">Teléfono</label>
+                                <input type="tel" id="telefono" value="+52 123 456 7890" disabled>
                             </div>
-                            <button type="submit" class="btn primary-btn contact-btn">Enviar Mensaje</button>
+                            <div class="form-group">
+                                <label for="departamento">Departamento</label>
+                                <input type="text" id="departamento" value="Facultad de Ciencias" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for="posicion">Posición</label>
+                                <input type="text" id="posicion" value="Profesor Investigador" disabled>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="bio">Biografía</label>
+                                <textarea id="bio" disabled>Doctor en Ciencias Computacionales con especialidad en Inteligencia Artificial. Más de 15 años de experiencia en investigación y docencia universitaria. Autor de múltiples publicaciones en revistas internacionales y conferencista invitado en diversos eventos académicos.</textarea>
+                            </div>
                         </form>
                     </div>
-                </div>
-                
-                <!-- Recursos Útiles -->
-                <div class="sidebar-card">
-                    <div class="sidebar-card-header">
-                        <h3><i class="fas fa-book"></i> Recursos Útiles</h3>
-                    </div>
-                    <div class="sidebar-card-content">
-                        <ul class="resources-list">
-                            <li><a href="#"><i class="fas fa-file-pdf"></i> Guía de Usuario</a></li>
-                            <li><a href="#"><i class="fas fa-video"></i> Tutoriales</a></li>
-                            <li><a href="#"><i class="fas fa-question-circle"></i> Preguntas Frecuentes</a></li>
-                            <li><a href="#"><i class="fas fa-download"></i> Plantillas</a></li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <!-- Próximos Eventos -->
-                <div class="sidebar-card">
-                    <div class="sidebar-card-header">
-                        <h3><i class="fas fa-calendar-alt"></i> Próximos Eventos</h3>
-                    </div>
-                    <div class="sidebar-card-content">
-                        <div class="event-item">
-                            <div class="event-date">
-                                <span class="event-day">15</span>
-                                <span class="event-month">MAR</span>
+                    
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <div class="section-title">Estadísticas</div>
+                        </div>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value">42</div>
+                                <div class="stat-label">Documentos</div>
                             </div>
-                            <div class="event-details">
-                                <h4>Webinar: Nuevas Funcionalidades</h4>
-                                <p>10:00 AM - 11:30 AM</p>
+                            <div class="stat-item">
+                                <div class="stat-value">15</div>
+                                <div class="stat-label">Publicaciones</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">8</div>
+                                <div class="stat-label">Proyectos</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">23</div>
+                                <div class="stat-label">Colaboraciones</div>
                             </div>
                         </div>
-                        <div class="event-item">
-                            <div class="event-date">
-                                <span class="event-day">22</span>
-                                <span class="event-month">MAR</span>
-                            </div>
-                            <div class="event-details">
-                                <h4>Taller de Productividad</h4>
-                                <p>2:00 PM - 4:00 PM</p>
-                            </div>
+                        
+                        <div class="chart-container">
+                            <canvas id="activityChart"></canvas>
                         </div>
-                        <a href="#" class="see-all-link">Ver todos los eventos <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <div class="section-title">Actividad reciente</div>
+                        </div>
+                        
+                        <div class="activity-list" id="activity-list">
+                            <!-- Activities will be added here -->
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
-
-    <!-- Nuevo Footer profesional -->
-    <footer class="site-footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <h4>Sobre Nosotros</h4>
-                <p>Somos una plataforma dedicada a mejorar la productividad y comunicación de equipos profesionales a través de soluciones digitales innovadoras.</p>
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-linkedin"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-            <div class="footer-section">
-                <h4>Enlaces Rápidos</h4>
-                <ul>
-                    <li><a href="#">Inicio</a></li>
-                    <li><a href="#">Servicios</a></li>
-                    <li><a href="#">Blog</a></li>
-                    <li><a href="#">Políticas</a></li>
-                    <li><a href="#">Términos y Condiciones</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Contacto</h4>
-                <ul class="contact-info">
-                    <li><i class="fas fa-map-marker-alt"></i> Av. Principal 123, Ciudad</li>
-                    <li><i class="fas fa-phone"></i> +34 912 345 678</li>
-                    <li><i class="fas fa-envelope"></i> info@nombreproyecto.com</li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Boletín Informativo</h4>
-                <p>Suscríbete para recibir actualizaciones y noticias.</p>
-                <form class="newsletter-form">
-                    <input type="email" placeholder="Tu correo electrónico" required>
-                    <button type="submit" class="newsletter-btn"><i class="fas fa-paper-plane"></i></button>
-                </form>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 Nombre Proyecto. Todos los derechos reservados.</p>
-        </div>
-    </footer>
-
+    </div>
+    
+    <script src="js/common.js"></script>
     <script src="js/perfil.js"></script>
 </body>
 </html>
