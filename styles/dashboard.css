@@ -1,10 +1,44 @@
 /* Dashboard specific styles */
 
 .dashboard-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
     padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Estilos para la conversión de PDF */
+#fileInfoContainer {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.file-info {
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.conversion-result {
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.conversion-result.success {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+}
+
+.conversion-result.error {
+    background-color: var(--error-bg);
+    color: var(--error-text);
+}
+
+.hidden {
+    display: none;
 }
 
 .dashboard-header {

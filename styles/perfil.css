@@ -317,8 +317,105 @@
     color: var(--text-secondary);
 }
 
+/* Support Section Styles */
+.support-section {
+    background-color: var(--bg-light);
+    padding: 40px 20px;
+    margin-top: 20px;
+}
+
+.support-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.support-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.support-header h2 {
+    font-size: 1.8rem;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.support-header p {
+    color: var(--text-secondary);
+}
+
+.support-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.support-card {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.support-card:hover {
+    transform: translateY(-5px);
+}
+
+.support-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.support-card h3 {
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.support-card p {
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+}
+
+.support-link {
+    display: block;
+    color: var(--primary-color);
+    text-decoration: none;
+    margin-bottom: 5px;
+    transition: color 0.2s;
+}
+
+.support-link:hover {
+    color: var(--primary-dark);
+}
+
+.help-links {
+    list-style: none;
+    padding: 0;
+}
+
+.help-links li {
+    margin-bottom: 10px;
+}
+
+.report-issue-btn {
+    margin-top: 10px;
+}
+
+.support-footer {
+    text-align: center;
+    margin-top: 30px;
+    color: var(--text-secondary);
+}
+
 /* Responsive adjustments */
 @media (max-width: 992px) {
+    .support-grid {
+        grid-template-columns: 1fr;
+    }
+
     .profile-content {
         grid-template-columns: 1fr;
     }

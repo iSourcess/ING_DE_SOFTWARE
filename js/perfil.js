@@ -4,6 +4,24 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeProfile();
+    
+    // Initialize report issue functionality
+    const reportIssueBtn = document.getElementById('report-issue-btn');
+    
+    if (reportIssueBtn) {
+        reportIssueBtn.addEventListener('click', () => {
+            // You could replace this with a modal or a more sophisticated reporting mechanism
+            const issueDetails = prompt('Por favor, describe el problema que estás experimentando:');
+            
+            if (issueDetails) {
+                // In a real application, you would send this to a backend service
+                alert('Gracias por reportar el problema. Nuestro equipo de soporte lo revisará pronto.');
+                
+                // Optional: Log the issue (in a real app, this would be an API call)
+                console.log('Problema reportado:', issueDetails);
+            }
+        });
+    }
 });
 
 function initializeProfile() {
@@ -12,6 +30,9 @@ function initializeProfile() {
     
     // Initialize profile image upload
     initializeImageUpload();
+    
+    // Initialize CV management
+    initializeCVManagement();
     
     // Initialize activity chart
     initializeActivityChart();
@@ -110,22 +131,58 @@ function updateProfileInfo() {
 function initializeImageUpload() {
     const uploadBtn = document.getElementById('upload-image-btn');
     const profileImage = document.querySelector('.profile-image');
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
     
+    // Set default icon when no profile picture exists
+    if (!profileImage.src || profileImage.src.includes('placeholder')) {
+        profileImage.src = 'path/to/default-profile-icon.svg'; // Replace with actual path to a default icon
+    }
+
     if (uploadBtn && profileImage) {
         uploadBtn.addEventListener('click', function() {
-            // In a real app, this would open a file picker
-            // For demo purposes, we'll just change the image
-            const randomId = Math.floor(Math.random() * 100);
-            profileImage.src = `https://randomuser.me/api/portraits/men/${randomId}.jpg`;
-            
-            // Update user menu avatar
-            const userAvatar = document.querySelector('.user-avatar');
-            if (userAvatar) {
-                userAvatar.src = profileImage.src;
-            }
-            
-            showNotification('Imagen de perfil actualizada', 'success');
+            fileInput.click();
         });
+
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // Set profile image to uploaded file
+                    profileImage.src = e.target.result;
+                    
+                    // Update user menu avatar
+                    const userAvatar = document.querySelector('.user-avatar');
+                    if (userAvatar) {
+                        userAvatar.src = profileImage.src;
+                    }
+                    
+                    // Optional: Save to localStorage for persistence
+                    localStorage.setItem('profilePicture', e.target.result);
+                    
+                    showNotification('Imagen de perfil actualizada', 'success');
+                };
+                
+                reader.readAsDataURL(file);
+            } else {
+                showNotification('Por favor, seleccione un archivo de imagen válido', 'error');
+            }
+        });
+    }
+
+    // Load saved profile picture on page load
+    const savedProfilePicture = localStorage.getItem('profilePicture');
+    if (savedProfilePicture) {
+        profileImage.src = savedProfilePicture;
+        
+        // Update user menu avatar
+        const userAvatar = document.querySelector('.user-avatar');
+        if (userAvatar) {
+            userAvatar.src = savedProfilePicture;
+        }
     }
 }
 
@@ -188,6 +245,333 @@ function initializeActivityChart() {
             }
         });
     }
+}
+
+// CV Upload and Download Functionality
+function initializeCVManagement() {
+    const cvUploadBtn = document.getElementById('cv-upload-btn');
+    const cvDownloadBtn = document.getElementById('cv-download-btn');
+    const cvFileInput = document.getElementById('cv-file-input');
+
+    // Initialize CV data in localStorage if not exists
+    if (!localStorage.getItem('cvData')) {
+        const initialCVData = {
+            formacionAcademica: document.getElementById('formacion-academica').value.trim(),
+            experienciaProfesional: document.getElementById('experiencia-profesional').value.trim(),
+            publicaciones: document.getElementById('publicaciones').value.trim(),
+            proyectos: document.getElementById('proyectos').value.trim()
+        };
+        localStorage.setItem('cvData', JSON.stringify(initialCVData));
+    }
+
+    // Upload button click handler
+    cvUploadBtn.addEventListener('click', () => {
+        cvFileInput.click();
+    });
+
+    // Download button click handler
+    cvDownloadBtn.addEventListener('click', generatePDF);
+
+    // File input change handler
+    cvFileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            if (file.type === 'application/pdf') {
+                mammoth.extractRawText({ arrayBuffer: file })
+                    .then((result) => {
+                        localStorage.setItem('uploadedCVContent', result.value);
+                        showNotification('CV subido exitosamente', 'success');
+                    })
+                    .catch((error) => {
+                        console.error('Error processing PDF:', error);
+                        showNotification('Error al procesar el CV', 'error');
+                    });
+            } else if (file.type === 'text/plain' || file.type === 'application/msword') {
+                preserveCVFormat(file);
+            } else {
+                showNotification('Por favor, suba un archivo PDF o de texto', 'error');
+            }
+        }
+    });
+
+    // Initialize CV form with data from localStorage
+    const cvData = JSON.parse(localStorage.getItem('cvData') || '{}');
+    document.getElementById('formacion-academica').value = cvData.formacionAcademica || '';
+    document.getElementById('experiencia-profesional').value = cvData.experienciaProfesional || '';
+    document.getElementById('publicaciones').value = cvData.publicaciones || '';
+    document.getElementById('proyectos').value = cvData.proyectos || '';
+}
+
+function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Retrieve CV data
+    const cvData = JSON.parse(localStorage.getItem('cvData') || '{}');
+
+    // Check if a custom CV has been uploaded
+    const uploadedCV = localStorage.getItem('uploadedCVContent');
+
+    if (uploadedCV) {
+        // If a custom CV has been uploaded, use its content directly
+        doc.setFontSize(12);
+        const splitText = doc.splitTextToSize(uploadedCV, 180);
+        doc.text(splitText, 15, 20);
+        doc.save('curriculum_vitae.pdf');
+        return;
+    }
+
+    // Default professional layout
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Curriculum Vitae', 105, 20, null, null, 'center');
+
+    let yOffset = 40;
+
+    // Personal Information Section
+    doc.setFontSize(14);
+    doc.text('Información Personal', 20, yOffset);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    yOffset += 10;
+
+    doc.text(`Nombre: ${cvData.nombre || 'No especificado'}`, 30, yOffset);
+    yOffset += 7;
+    doc.text(`Correo: ${cvData.correo || 'No especificado'}`, 30, yOffset);
+    yOffset += 7;
+    doc.text(`Teléfono: ${cvData.telefono || 'No especificado'}`, 30, yOffset);
+    yOffset += 15;
+
+    // Sections with dynamic content
+    const sections = [
+        { title: 'Formación Académica', content: 'formacionAcademica' },
+        { title: 'Experiencia Profesional', content: 'experienciaProfesional' },
+        { title: 'Publicaciones', content: 'publicaciones' },
+        { title: 'Proyectos', content: 'proyectos' }
+    ];
+
+    sections.forEach(section => {
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(section.title, 20, yOffset);
+        
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        yOffset += 10;
+
+        const content = cvData[section.content] || 'No hay información disponible';
+        const lines = doc.splitTextToSize(content, 170);
+        doc.text(lines, 30, yOffset);
+        yOffset += lines.length * 7 + 10;
+    });
+
+    // Save the PDF
+    doc.save('curriculum_vitae.pdf');
+}
+
+// Enhanced CV upload function to preserve original formatting
+function preserveCVFormat(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const content = e.target.result;
+        localStorage.setItem('uploadedCVContent', content);
+        showNotification('CV subido con su formato original', 'success');
+    };
+    reader.readAsText(file);
+}
+    const cvEditBtn = document.getElementById('cv-edit-btn');
+    const cvForm = document.getElementById('cv-form');
+    const cvFileInput = document.getElementById('cv-file-input');
+
+    // CV Upload handling
+    if (cvUploadBtn && cvFileInput) {
+        cvUploadBtn.addEventListener('click', () => {
+            cvFileInput.click();
+        });
+
+        cvFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                // Check file type
+                if (file.type === 'application/pdf') {
+                    // Read and parse PDF file
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        // Use mammoth to extract text from PDF
+                        mammoth.extractRawText({ arrayBuffer: e.target.result })
+                            .then((result) => {
+                                // Populate CV form with extracted text
+                                populateCVForm(result.value);
+                                showNotification('CV subido exitosamente', 'success');
+                            })
+                            .catch((error) => {
+                                console.error('Error processing PDF:', error);
+                                showNotification('Error al procesar el CV', 'error');
+                            });
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else {
+                    showNotification('Por favor, suba un archivo PDF', 'error');
+                }
+            }
+        });
+    }
+
+    // CV Edit handling
+    if (cvEditBtn && cvForm) {
+        cvEditBtn.addEventListener('click', () => {
+            const inputs = cvForm.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.disabled = false;
+            });
+            cvEditBtn.style.display = 'none';
+            document.getElementById('cv-save-btn').style.display = 'block';
+            document.getElementById('cv-cancel-btn').style.display = 'block';
+        });
+    }
+
+    // CV Save handling
+    const cvSaveBtn = document.getElementById('cv-save-btn');
+    if (cvSaveBtn) {
+        cvSaveBtn.addEventListener('click', () => {
+            // Validate and save CV information
+            saveCVInformation();
+            
+            // Disable inputs
+            const inputs = cvForm.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.disabled = true;
+            });
+
+            // Hide save and cancel, show edit
+            cvSaveBtn.style.display = 'none';
+            document.getElementById('cv-cancel-btn').style.display = 'none';
+            cvEditBtn.style.display = 'block';
+
+            showNotification('CV actualizado correctamente', 'success');
+        });
+    }
+
+    // CV Download handling
+    if (cvDownloadBtn) {
+        cvDownloadBtn.addEventListener('click', () => {
+            generatePDF();
+        });
+    }
+
+function populateCVForm(text) {
+    // Basic text parsing (this would need to be more sophisticated)
+    const sections = {
+        'Datos Personales': ['nombre', 'correo', 'telefono'],
+        'Formación Académica': ['formacion-academica'],
+        'Experiencia Profesional': ['experiencia-profesional'],
+        'Publicaciones': ['publicaciones'],
+        'Proyectos': ['proyectos']
+    };
+
+    // Simple parsing logic (would need refinement)
+    Object.entries(sections).forEach(([section, fields]) => {
+        fields.forEach(field => {
+            const element = document.getElementById(field);
+            if (element) {
+                // Basic text extraction for each field
+                const sectionStart = text.indexOf(section);
+                if (sectionStart !== -1) {
+                    // Extract text for this field (very basic implementation)
+                    const nextSectionStart = Object.keys(sections).find(
+                        key => text.indexOf(key, sectionStart + section.length) !== -1
+                    );
+                    const sectionText = nextSectionStart 
+                        ? text.substring(sectionStart, text.indexOf(nextSectionStart))
+                        : text.substring(sectionStart);
+                    
+                    element.value = sectionText.trim();
+                }
+            }
+        });
+    });
+}
+
+function saveCVInformation() {
+    // Collect form data
+    const cvData = {
+        nombre: document.getElementById('nombre').value,
+        correo: document.getElementById('correo').value,
+        telefono: document.getElementById('telefono').value,
+        formacionAcademica: document.getElementById('formacion-academica').value,
+        experienciaProfesional: document.getElementById('experiencia-profesional').value,
+        publicaciones: document.getElementById('publicaciones').value,
+        proyectos: document.getElementById('proyectos').value
+    };
+
+    // In a real application, this would be saved to a backend
+    localStorage.setItem('cvData', JSON.stringify(cvData));
+}
+
+function generatePDF() {
+    // Use jsPDF to generate a professional CV PDF
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Retrieve CV data
+    const cvData = JSON.parse(localStorage.getItem('cvData') || '{}');
+
+    // Set up PDF layout
+    doc.setFontSize(18);
+    doc.text('Curriculum Vitae', 105, 20, null, null, 'center');
+
+    doc.setFontSize(12);
+    let yOffset = 40;
+
+    // Personal Information
+    doc.setFont('helvetica', 'bold');
+    doc.text('Datos Personales', 20, yOffset);
+    doc.setFont('helvetica', 'normal');
+    yOffset += 10;
+    doc.text(`Nombre: ${cvData.nombre || ''}`, 30, yOffset);
+    yOffset += 7;
+    doc.text(`Correo: ${cvData.correo || ''}`, 30, yOffset);
+    yOffset += 7;
+    doc.text(`Teléfono: ${cvData.telefono || ''}`, 30, yOffset);
+    yOffset += 15;
+
+    // Academic Formation
+    doc.setFont('helvetica', 'bold');
+    doc.text('Formación Académica', 20, yOffset);
+    doc.setFont('helvetica', 'normal');
+    yOffset += 10;
+    const formacionLines = doc.splitTextToSize(cvData.formacionAcademica || '', 170);
+    doc.text(formacionLines, 30, yOffset);
+    yOffset += formacionLines.length * 7 + 10;
+
+    // Professional Experience
+    doc.setFont('helvetica', 'bold');
+    doc.text('Experiencia Profesional', 20, yOffset);
+    doc.setFont('helvetica', 'normal');
+    yOffset += 10;
+    const experienciaLines = doc.splitTextToSize(cvData.experienciaProfesional || '', 170);
+    doc.text(experienciaLines, 30, yOffset);
+    yOffset += experienciaLines.length * 7 + 10;
+
+    // Publications
+    doc.setFont('helvetica', 'bold');
+    doc.text('Publicaciones', 20, yOffset);
+    doc.setFont('helvetica', 'normal');
+    yOffset += 10;
+    const publicacionesLines = doc.splitTextToSize(cvData.publicaciones || '', 170);
+    doc.text(publicacionesLines, 30, yOffset);
+    yOffset += publicacionesLines.length * 7 + 10;
+
+    // Projects
+    doc.setFont('helvetica', 'bold');
+    doc.text('Proyectos', 20, yOffset);
+    doc.setFont('helvetica', 'normal');
+    yOffset += 10;
+    const proyectosLines = doc.splitTextToSize(cvData.proyectos || '', 170);
+    doc.text(proyectosLines, 30, yOffset);
+
+    // Save the PDF
+    doc.save('curriculum_vitae.pdf');
 }
 
 function loadRecentActivity() {

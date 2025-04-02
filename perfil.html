@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/perfil.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -198,6 +200,59 @@
                 </div>
                 
                 <div class="profile-main">
+                    <!-- Add this to the profile-main div in perfil.html -->
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <div class="section-title">Curriculum Vitae</div>
+                            <div class="section-actions">
+                                <input type="file" id="cv-file-input" accept=".pdf" style="display: none;">
+                                <button class="btn btn-secondary" id="cv-upload-btn">
+                                    <i class="fas fa-upload"></i> Subir CV
+                                </button>
+                                <button class="btn btn-secondary" id="cv-download-btn">
+                                    <i class="fas fa-download"></i> Descargar CV
+                                </button>
+                                <button class="btn btn-secondary" id="cv-cancel-btn" style="display: none;">Cancelar</button>
+                                <button class="btn btn-primary" id="cv-save-btn" style="display: none;">Guardar</button>
+                                <button class="btn btn-primary" id="cv-edit-btn">Editar</button>
+                            </div>
+                        </div>
+
+                        <form class="profile-form" id="cv-form">
+                            <div class="form-group full-width">
+                                <label for="formacion-academica">Formación Académica</label>
+                                <textarea id="formacion-academica" disabled>
+Doctor en Ciencias Computacionales, Universidad Tecnológica Nacional
+Maestría en Inteligencia Artificial, Instituto de Tecnología Avanzada
+Licenciatura en Computación, Universidad Central
+                                </textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="experiencia-profesional">Experiencia Profesional</label>
+                                <textarea id="experiencia-profesional" disabled>
+Profesor Investigador, Universidad Tecnológica, 2015-Presente
+Investigador Principal, Centro de Innovación Tecnológica, 2012-2015
+Consultor en Transformación Digital, Empresa Consultora Global, 2010-2012
+                                </textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="publicaciones">Publicaciones</label>
+                                <textarea id="publicaciones" disabled>
+"Avances en Machine Learning", Revista Internacional de Tecnología, 2022
+"Ética en Inteligencia Artificial", Congreso Mundial de Computación, 2021
+"Sistemas Inteligentes de Gestión", Journal of Advanced Computing, 2020
+                                </textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="proyectos">Proyectos Destacados</label>
+                                <textarea id="proyectos" disabled>
+Desarrollo de Sistema de Predicción Médica con IA
+Plataforma de Aprendizaje Adaptativo
+Proyecto de Investigación en Robótica Educativa
+                                </textarea>
+                            </div>
+                        </form>
+                    </div>
                     <div class="profile-section">
                         <div class="section-header">
                             <div class="section-title">Información personal</div>
@@ -278,6 +333,61 @@
                             <!-- Activities will be added here -->
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add this right before the closing </div> of main-content -->
+        <div class="support-section">
+            <div class="support-container">
+                <div class="support-header">
+                    <h2>Soporte y Ayuda</h2>
+                    <p>Estamos aquí para ayudarte con cualquier inconveniente</p>
+                </div>
+                
+                <div class="support-grid">
+                    <div class="support-card">
+                        <div class="support-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h3>Soporte Técnico</h3>
+                        <p>Asistencia inmediata para problemas técnicos</p>
+                        <a href="mailto:soporte.tecnico@universidad.edu" class="support-link">
+                            <i class="fas fa-envelope"></i> soporte.tecnico@universidad.edu
+                        </a>
+                        <a href="tel:+525551234567" class="support-link">
+                            <i class="fas fa-phone"></i> +52 (555) 123-4567
+                        </a>
+                    </div>
+                    
+                    <div class="support-card">
+                        <div class="support-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <h3>Centro de Ayuda</h3>
+                        <p>Preguntas frecuentes y guías de usuario</p>
+                        <ul class="help-links">
+                            <li><a href="#" class="support-link">Guía de Usuario</a></li>
+                            <li><a href="#" class="support-link">Preguntas Frecuentes</a></li>
+                            <li><a href="#" class="support-link">Tutoriales</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="support-card">
+                        <div class="support-icon">
+                            <i class="fas fa-life-ring"></i>
+                        </div>
+                        <h3>Reportar Problema</h3>
+                        <p>Ayúdanos a mejorar tu experiencia</p>
+                        <button class="btn btn-secondary report-issue-btn" id="report-issue-btn">
+                            <i class="fas fa-bug"></i> Reportar Incidencia
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="support-footer">
+                    <p>Horario de Atención: Lunes a Viernes, 8:00 AM - 6:00 PM</p>
+                    <p>Tiempo de respuesta estimado: Dentro de 24 horas</p>
                 </div>
             </div>
         </div>

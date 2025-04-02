@@ -1,27 +1,249 @@
-// dashboard.js
+// Utilidades
+function generateId() {
+    return Math.random().toString(36).substr(2, 9);
+}
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function findFolder(folderName, folderList = folders) {
+    for (let folder of folderList) {
+        if (folder.name === folderName) return folder;
+        if (folder.children) {
+            const found = findFolder(folderName, folder.children);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+// Datos para la estructura de carpetas - Optimizado para no crear nuevas fechas repetidamente
+const DATES = {
+    feb15: new Date('2023-02-15'),
+    feb16: new Date('2023-02-16'),
+    feb17: new Date('2023-02-17'),
+    feb18: new Date('2023-02-18'),
+    jan10: new Date('2023-01-10')
+};
+
+const folderStructure = [
+    {
+        name: "Docencia",
+        type: "folder",
+        icon: "fas fa-chalkboard-teacher",
+        fileCount: 0,
+        createdAt: DATES.feb15,
+        children: [
+            {
+                name: "Programas Académicos",
+                type: "folder",
+                icon: "fas fa-book",
+                fileCount: 0,
+                createdAt: DATES.feb16,
+                children: []
+            },
+            {
+                name: "Material Didáctico",
+                type: "folder",
+                icon: "fas fa-file-alt",
+                fileCount: 0,
+                createdAt: DATES.feb16,
+                children: []
+            },
+            {
+                name: "Evaluaciones",
+                type: "folder",
+                icon: "fas fa-tasks",
+                fileCount: 0,
+                createdAt: DATES.feb16,
+                children: []
+            }
+        ]
+    },
+    {
+        name: "Investigación",
+        type: "folder",
+        icon: "fas fa-flask",
+        fileCount: 0,
+        createdAt: DATES.feb15,
+        children: [
+            {
+                name: "Proyectos Actuales",
+                type: "folder",
+                icon: "fas fa-project-diagram",
+                fileCount: 0,
+                createdAt: DATES.feb16,
+                children: []
+            },
+            {
+                name: "Publicaciones",
+                type: "folder",
+                icon: "fas fa-file-alt",
+                fileCount: 0,
+                createdAt: DATES.feb16,
+                children: []
+            },
+            {
+                name: "Colaboraciones",
+                type: "folder",
+                icon: "fas fa-users",
+                fileCount: 0,
+                createdAt: DATES.feb16,
+                children: []
+            }
+        ]
+    },
+    {
+        name: "Extensión",
+        type: "folder",
+        icon: "fas fa-users",
+        fileCount: 0,
+        createdAt: DATES.feb15,
+        children: [
+            {
+                name: "Proyectos Comunitarios",
+                type: "folder",
+                icon: "fas fa-hands-helping",
+                fileCount: 0,
+                createdAt: DATES.feb16,
+                children: []
+            },
+            {
+                name: "Eventos",
+                type: "folder",
+                icon: "fas fa-calendar-alt",
+                fileCount: 0,
+                createdAt: DATES.feb16,
+                children: []
+            },
+            {
+                name: "Convenios",
+                type: "folder",
+                icon: "fas fa-handshake",
+                fileCount: 0,
+                createdAt: DATES.feb16,
+                children: []
+            }
+        ]
+    }
+];
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Cache DOM selectors - Mejora la eficiencia al evitar búsquedas repetidas en el DOM
+    const DOM = {
+        menuToggle: document.getElementById('menuToggle'),
+        sidebar: document.querySelector('.sidebar'),
+        closeSidebar: document.querySelector('.close-sidebar'),
+        explorerContent: document.getElementById('explorer-content'),
+        folderItems: document.querySelectorAll('.folder-item'),
+        breadcrumb: document.querySelector('.breadcrumb'),
+        explorerSearch: document.querySelector('.explorer-search input'),
+        sortButton: document.querySelector('.explorer-actions .action-btn'),
+        createFolderBtn: document.getElementById('createFolderBtn'),
+        createFolderDialog: document.getElementById('createFolderDialog'),
+        closeFolderDialog: document.getElementById('closeFolderDialog'),
+        cancelFolder: document.getElementById('cancelFolder'),
+        confirmFolder: document.getElementById('confirmFolder'),
+        folderNameInput: document.getElementById('folderName'),
+        uploadBtn: document.getElementById('uploadBtn'),
+        uploadProgress: document.getElementById('uploadProgress'),
+        notificationToggle: document.getElementById('notification-toggle'),
+        notificationPanel: document.getElementById('notification-panel'),
+        notificationList: document.getElementById('notification-list'),
+        markAllRead: document.querySelector('.mark-all-read')
+    };
+
     // Sidebar Toggle
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.querySelector('.sidebar');
-    const closeSidebar = document.querySelector('.close-sidebar');
-
-    menuToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
+    DOM.menuToggle.addEventListener('click', () => {
+        DOM.sidebar.classList.toggle('open');
     });
 
-    closeSidebar.addEventListener('click', () => {
-        sidebar.classList.remove('open');
+    DOM.closeSidebar.addEventListener('click', () => {
+        DOM.sidebar.classList.remove('open');
     });
+
+    // Función para crear elemento de carpeta
+    function createFolderElement(folder) {
+        const folderElement = document.createElement('div');
+        folderElement.className = 'folder-item';
+        folderElement.dataset.name = folder.name;
+        
+        folderElement.innerHTML = `
+            <div class="folder-icon"><i class="${folder.icon}"></i></div>
+            <div class="folder-details">
+                <div class="folder-name">${folder.name}</div>
+                <div class="file-meta">${folder.fileCount} elementos</div>
+            </div>
+        `;
+        
+        // Agregar evento de click para navegar a las subcarpetas
+        folderElement.addEventListener('click', function() {
+            navigateToFolder(folder);
+        });
+        
+        return folderElement;
+    }
+    
+    // Función para navegar a una carpeta
+    function navigateToFolder(folder) {
+        // Actualizar breadcrumb
+        updateBreadcrumb(folder.name);
+        
+        // Limpiar el contenedor
+        DOM.explorerContent.innerHTML = '';
+        
+        // Si tiene subcarpetas, mostrarlas
+        if (folder.children && folder.children.length > 0) {
+            // Crear un fragmento para mejorar el rendimiento al agregar múltiples elementos
+            const fragment = document.createDocumentFragment();
+            folder.children.forEach(child => {
+                fragment.appendChild(createFolderElement(child));
+            });
+            DOM.explorerContent.appendChild(fragment);
+        } else {
+            // Mostrar mensaje de carpeta vacía
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-folder-message';
+            emptyMessage.textContent = 'Esta carpeta está vacía';
+            emptyMessage.style.gridColumn = '1 / -1';
+            emptyMessage.style.textAlign = 'center';
+            emptyMessage.style.padding = '50px 0';
+            emptyMessage.style.color = 'var(--text-secondary)';
+            DOM.explorerContent.appendChild(emptyMessage);
+        }
+    }
+    
+    // Función para actualizar la navegación de breadcrumb
+    function updateBreadcrumb(folderName) {
+        // Si es una subcarpeta, mostrar la ruta completa
+        if (folderName) {
+            DOM.breadcrumb.innerHTML = `
+                <span class="breadcrumb-item" data-path="home">Inicio</span>
+                <span class="separator">/</span>
+                <span class="breadcrumb-item" data-path="my-documents">Mis documentos</span>
+                <span class="separator">/</span>
+                <span class="breadcrumb-item active">${folderName}</span>
+            `;
+        } else {
+            // Si es la raíz, mostrar solo Inicio / Mis documentos
+            DOM.breadcrumb.innerHTML = `
+                <span class="breadcrumb-item" data-path="home">Inicio</span>
+                <span class="separator">/</span>
+                <span class="breadcrumb-item active">Mis documentos</span>
+            `;
+        }
+    }
 
     // Initialize theme toggle functionality from common.js
     document.addEventListener('DOMContentLoaded', () => {
         initializeThemeToggle();
     });
 
-    // Submenu Toggle
-    const menuItems = document.querySelectorAll('.menu-item');
-    menuItems.forEach(item => {
-        item.addEventListener('click', (e) => {
+    // Submenu Toggle - Delegación de eventos para mejor rendimiento
+    document.querySelector('.nav-menu').addEventListener('click', (e) => {
+        if (e.target.closest('.menu-item')) {
+            const item = e.target.closest('.menu-item');
             const submenu = item.nextElementSibling;
             if (submenu && submenu.classList.contains('submenu')) {
                 submenu.classList.toggle('open');
@@ -29,17 +251,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 chevron.classList.toggle('fa-chevron-right');
                 chevron.classList.toggle('fa-chevron-down');
             }
-        });
+        }
     });
 
     // File Explorer Enhanced Functionality
-    const explorerContent = document.getElementById('explorer-content');
-    const folderItems = document.querySelectorAll('.folder-item');
-    const breadcrumb = document.querySelector('.breadcrumb');
-    const explorerSearch = document.querySelector('.explorer-search input');
-    const sortButton = document.querySelector('.explorer-actions .action-btn');
-
-    // Improved file and folder management
     class FileExplorer {
         constructor() {
             this.items = [];
@@ -54,6 +269,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 { name: 'Tamaño (mayor a menor)', method: this.sortBySizeDescending },
                 { name: 'Cantidad de archivos', method: this.sortByFileCount }
             ];
+            
+            // Memorización para evitar cálculos repetidos
+            this.fileIconCache = {};
         }
 
         // Sorting methods
@@ -83,11 +301,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Render items
         renderItems(items) {
-            explorerContent.innerHTML = '';
+            // Usar un fragmento de documento para mejor rendimiento
+            const fragment = document.createDocumentFragment();
+            
+            DOM.explorerContent.innerHTML = '';
             items.forEach(item => {
                 const itemElement = this.createItemElement(item);
-                explorerContent.appendChild(itemElement);
+                fragment.appendChild(itemElement);
             });
+            
+            DOM.explorerContent.appendChild(fragment);
         }
 
         createItemElement(item) {
@@ -111,6 +334,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `;
+
+            // Usar eventos delegados para evitar múltiples listeners
+            itemElement.dataset.itemName = item.name;
+            itemElement.dataset.itemType = item.type;
+            if (item.type === 'file') {
+                itemElement.dataset.extension = item.extension;
+                itemElement.dataset.size = item.size;
+            }
 
             // Remove previous action buttons and add context menu
             itemElement.addEventListener('contextmenu', (e) => {
@@ -164,13 +395,16 @@ document.addEventListener('DOMContentLoaded', () => {
             this.contextMenu.style.top = `${event.clientY}px`;
             this.contextMenu.style.left = `${event.clientX}px`;
 
-            // Add event listeners to menu items
-            const menuItemElements = this.contextMenu.querySelectorAll('.context-menu-item');
-            menuItemElements.forEach((el, index) => {
-                el.addEventListener('click', () => {
-                    menuItems[index].action();
-                    this.removeContextMenu();
-                });
+            // Add event listeners to menu items - Delegación de eventos
+            this.contextMenu.addEventListener('click', (e) => {
+                const menuItem = e.target.closest('.context-menu-item');
+                if (menuItem) {
+                    const index = Array.from(this.contextMenu.children).indexOf(menuItem);
+                    if (index !== -1) {
+                        menuItems[index].action();
+                        this.removeContextMenu();
+                    }
+                }
             });
 
             // Append to body
@@ -194,20 +428,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         getFileIcon(extension) {
+            // Uso de caché para no repetir la lógica de switch
+            if (!extension) return 'fas fa-file-alt';
+            
+            if (this.fileIconCache[extension]) {
+                return this.fileIconCache[extension];
+            }
+            
+            let icon;
             switch(extension.toLowerCase()) {
-                case 'pdf': return 'fas fa-file-pdf';
+                case 'pdf': icon = 'fas fa-file-pdf'; break;
                 case 'docx':
-                case 'doc': return 'fas fa-file-word';
+                case 'doc': icon = 'fas fa-file-word'; break;
                 case 'xlsx':
-                case 'xls': return 'fas fa-file-excel';
+                case 'xls': icon = 'fas fa-file-excel'; break;
                 case 'pptx':
-                case 'ppt': return 'fas fa-file-powerpoint';
+                case 'ppt': icon = 'fas fa-file-powerpoint'; break;
                 case 'png':
                 case 'jpg':
                 case 'jpeg':
-                case 'gif': return 'fas fa-file-image';
-                default: return 'fas fa-file-alt';
+                case 'gif': icon = 'fas fa-file-image'; break;
+                default: icon = 'fas fa-file-alt'; break;
             }
+            
+            this.fileIconCache[extension] = icon;
+            return icon;
         }
 
         handleItemClick(item) {
@@ -226,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const simulatedFolderContents = [
                 { 
                     name: 'Documento ejemplo.pdf', 
-                    type: 'file', 
+                    type: 'file',
                     extension: 'pdf', 
                     size: 2400, 
                     createdAt: new Date('2023-01-15') 
@@ -244,7 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         updateBreadcrumb() {
-            breadcrumb.innerHTML = this.currentPath.map((pathItem, index) => `
+            DOM.breadcrumb.innerHTML = this.currentPath.map((pathItem, index) => `
                 <span${index === this.currentPath.length - 1 ? ' class="current"' : ''} 
                       data-index="${index}"
                       class="breadcrumb-item">
@@ -253,13 +498,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${index < this.currentPath.length - 1 ? '<span class="separator">/</span>' : ''}
             `).join('');
 
-            // Add click event to breadcrumb items for navigation
-            const breadcrumbItems = document.querySelectorAll('.breadcrumb-item');
-            breadcrumbItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const index = parseInt(item.dataset.index);
-                    this.navigateToBreadcrumbIndex(index);
-                });
+            // Add click event to breadcrumb items for navigation - Delegación de eventos
+            DOM.breadcrumb.addEventListener('click', (e) => {
+                const breadcrumbItem = e.target.closest('.breadcrumb-item');
+                if (breadcrumbItem) {
+                    const index = parseInt(breadcrumbItem.dataset.index);
+                    if (!isNaN(index)) {
+                        this.navigateToBreadcrumbIndex(index);
+                    }
+                }
             });
         }
 
@@ -366,23 +613,26 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(sortMenu);
             
             // Position the menu near the sort button
-            const buttonRect = sortButton.getBoundingClientRect();
+            const buttonRect = DOM.sortButton.getBoundingClientRect();
             sortMenu.style.top = `${buttonRect.bottom + window.scrollY}px`;
             sortMenu.style.left = `${buttonRect.left + window.scrollX}px`;
             
-            // Add event listeners to menu items
-            const menuItems = sortMenu.querySelectorAll('.context-menu-item');
-            menuItems.forEach((item, index) => {
-                item.addEventListener('click', () => {
-                    this.items.sort(this.sortOptions[index].method.bind(this));
-                    this.renderItems(this.items);
-                    sortMenu.remove();
-                });
+            // Add event listeners to menu items - Delegación de eventos
+            sortMenu.addEventListener('click', (e) => {
+                const menuItem = e.target.closest('.context-menu-item');
+                if (menuItem) {
+                    const index = Array.from(sortMenu.children).indexOf(menuItem);
+                    if (index !== -1) {
+                        this.items.sort(this.sortOptions[index].method.bind(this));
+                        this.renderItems(this.items);
+                        sortMenu.remove();
+                    }
+                }
             });
             
             // Close menu when clicking outside
             document.addEventListener('click', (e) => {
-                if (!sortMenu.contains(e.target) && e.target !== sortButton) {
+                if (!sortMenu.contains(e.target) && e.target !== DOM.sortButton) {
                     sortMenu.remove();
                 }
             }, { once: true });
@@ -392,26 +642,43 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize file explorer
     const fileExplorer = new FileExplorer();
     
-    // Initial data (would be fetched from backend in real scenario)
+    // Initial data (would be fetched from backend in real scenario) - Optimizado para reutilizar fechas
     fileExplorer.items = [
         { 
-            name: 'Documentos', 
+            name: 'Docencia', 
             type: 'folder', 
-            fileCount: 5, 
-            createdAt: new Date('2023-01-10') 
+            fileCount: 3, 
+            createdAt: DATES.jan10
         },
         { 
-            name: 'Imágenes', 
+            name: 'Investigación', 
             type: 'folder', 
-            fileCount: 12, 
-            createdAt: new Date('2023-02-15') 
+            fileCount: 3, 
+            createdAt: DATES.feb15
         },
         { 
-            name: 'Informe.pdf', 
-            type: 'file', 
-            extension: 'pdf', 
-            size: 1024, 
-            createdAt: new Date('2023-03-20') 
+            name: 'Extensión', 
+            type: 'folder', 
+            fileCount: 3, 
+            createdAt: DATES.feb15
+        },
+        { 
+            name: 'Artículos Científicos', 
+            type: 'folder', 
+            fileCount: 3, 
+            createdAt: DATES.feb15
+        },
+        { 
+            name: 'Tutorías', 
+            type: 'folder', 
+            fileCount: 3, 
+            createdAt: DATES.feb15
+        },
+        {
+            name: 'Gestión',
+            type: 'folder',
+            fileCount: 3,
+            createdAt: DATES.feb15,
         }
     ];
     
@@ -425,39 +692,37 @@ document.addEventListener('DOMContentLoaded', () => {
     fileExplorer.updateBreadcrumb();
     
     // Set up event listeners
-    if (explorerSearch) {
-        explorerSearch.addEventListener('input', (e) => {
-            fileExplorer.searchItems(e.target.value);
+    if (DOM.explorerSearch) {
+        // Evitar muchas búsquedas mientras escribe (debounce)
+        let searchTimeout;
+        DOM.explorerSearch.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                fileExplorer.searchItems(e.target.value);
+            }, 300);
         });
     }
     
-    if (sortButton) {
-        sortButton.addEventListener('click', () => {
+    if (DOM.sortButton) {
+        DOM.sortButton.addEventListener('click', () => {
             fileExplorer.showSortOptions();
         });
     }
 
     // Create Folder Dialog
-    const createFolderBtn = document.getElementById('createFolderBtn');
-    const createFolderDialog = document.getElementById('createFolderDialog');
-    const closeFolderDialog = document.getElementById('closeFolderDialog');
-    const cancelFolder = document.getElementById('cancelFolder');
-    const confirmFolder = document.getElementById('confirmFolder');
-    const folderNameInput = document.getElementById('folderName');
-
-    createFolderBtn.addEventListener('click', () => {
-        createFolderDialog.style.display = 'flex';
+    DOM.createFolderBtn.addEventListener('click', () => {
+        DOM.createFolderDialog.style.display = 'flex';
     });
 
-    [closeFolderDialog, cancelFolder].forEach(el => {
+    [DOM.closeFolderDialog, DOM.cancelFolder].forEach(el => {
         el.addEventListener('click', () => {
-            createFolderDialog.style.display = 'none';
-            folderNameInput.value = '';
+            DOM.createFolderDialog.style.display = 'none';
+            DOM.folderNameInput.value = '';
         });
     });
 
-    confirmFolder.addEventListener('click', () => {
-        const folderName = folderNameInput.value.trim();
+    DOM.confirmFolder.addEventListener('click', () => {
+        const folderName = DOM.folderNameInput.value.trim();
         if (folderName) {
             const newFolder = {
                 name: folderName,
@@ -467,16 +732,13 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             fileExplorer.items.push(newFolder);
             fileExplorer.renderItems(fileExplorer.items);
-            createFolderDialog.style.display = 'none';
-            folderNameInput.value = '';
+            DOM.createFolderDialog.style.display = 'none';
+            DOM.folderNameInput.value = '';
         }
     });
 
     // File Upload Functionality
-    const uploadBtn = document.getElementById('uploadBtn');
-    const uploadProgress = document.getElementById('uploadProgress');
-
-    uploadBtn.addEventListener('click', () => {
+    DOM.uploadBtn.addEventListener('click', () => {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.multiple = true;
@@ -487,12 +749,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleFileUpload(event) {
         const files = event.target.files;
         if (files.length > 0) {
-            uploadProgress.style.display = 'block';
+            DOM.uploadProgress.style.display = 'block';
             
             // Simulate upload progress
             let progress = 0;
-            const progressBar = uploadProgress.querySelector('.progress-fill');
-            const progressText = uploadProgress.querySelector('.upload-percentage');
+            const progressBar = DOM.uploadProgress.querySelector('.progress-fill');
+            const progressText = DOM.uploadProgress.querySelector('.upload-percentage');
             
             const uploadInterval = setInterval(() => {
                 progress += 10;
@@ -502,7 +764,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (progress >= 100) {
                     clearInterval(uploadInterval);
                     setTimeout(() => {
-                        uploadProgress.style.display = 'none';
+                        DOM.uploadProgress.style.display = 'none';
                         addUploadedFilesToExplorer(files);
                     }, 500);
                 }
@@ -511,6 +773,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addUploadedFilesToExplorer(files) {
+        // Crear todos los archivos a la vez usando un fragmento
+        const newFiles = [];
         for (let file of files) {
             const ext = file.name.split('.').pop().toLowerCase();
             const newFile = {
@@ -520,19 +784,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 size: file.size,
                 createdAt: new Date()
             };
-            fileExplorer.items.push(newFile);
+            newFiles.push(newFile);
         }
+        
+        fileExplorer.items = fileExplorer.items.concat(newFiles);
         fileExplorer.renderItems(fileExplorer.items);
     }
 
     // Notification Functionality
-    const notificationToggle = document.getElementById('notification-toggle');
-    const notificationPanel = document.getElementById('notification-panel');
-    const notificationList = document.getElementById('notification-list');
-    const markAllRead = document.querySelector('.mark-all-read');
-
-    notificationToggle.addEventListener('click', () => {
-        notificationPanel.classList.toggle('open');
+    DOM.notificationToggle.addEventListener('click', () => {
+        DOM.notificationPanel.classList.toggle('open');
     });
 
     // Mock notification data
@@ -543,34 +804,44 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     function loadNotifications() {
-        notificationList.innerHTML = notifications.map(notification => `
-            <div class="notification-item">
+        // Crear todas las notificaciones a la vez usando un fragmento
+        const fragment = document.createDocumentFragment();
+        
+        const notificationsHTML = notifications.map(notification => {
+            const notifItem = document.createElement('div');
+            notifItem.className = 'notification-item';
+            notifItem.innerHTML = `
                 <div class="notification-content">
                     <div class="notification-title">${notification.title}</div>
                     <div class="notification-description">${notification.description}</div>
                     <div class="notification-time">${notification.time}</div>
                 </div>
                 <button class="mark-read">Marcar como leído</button>
-            </div>
-        `).join('');
+            `;
+            return notifItem;
+        });
+        
+        notificationsHTML.forEach(el => fragment.appendChild(el));
+        DOM.notificationList.innerHTML = '';
+        DOM.notificationList.appendChild(fragment);
 
-        const markReadButtons = document.querySelectorAll('.mark-read');
-        markReadButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
+        // Usar delegación de eventos para mejorar rendimiento
+        DOM.notificationList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('mark-read')) {
                 e.target.closest('.notification-item').remove();
                 updateNotificationCount();
-            });
+            }
         });
     }
 
-    markAllRead.addEventListener('click', () => {
-        notificationList.innerHTML = '';
+    DOM.markAllRead.addEventListener('click', () => {
+        DOM.notificationList.innerHTML = '';
         updateNotificationCount();
     });
 
     function updateNotificationCount() {
         const notificationCount = document.getElementById('notification-count');
-        const remainingNotifications = notificationList.children.length;
+        const remainingNotifications = DOM.notificationList.children.length;
         notificationCount.textContent = remainingNotifications;
     }
 
