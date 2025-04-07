@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Función para manejar inicio de sesión con Google
     function handleGoogleSignIn() {
         const provider = new GoogleAuthProvider();
-        
+
         // Restringir a dominios de UDG
         provider.setCustomParameters({
             'hd': 'academicos.udg.mx'
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch((error) => {
                 console.error('Error en autenticación con Google:', error);
-                
+
                 let errorMessage = 'Error en la autenticación';
                 switch (error.code) {
                     case 'auth/account-exists-with-different-credential':
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Agregar botón de Google si no existe
     function addGoogleButton() {
         const loginFormContainer = document.getElementById('loginForm');
-        
+
         // Verificar si ya existe un botón de Google
         if (document.querySelector('.google-btn')) return;
 
@@ -100,14 +100,14 @@ document.addEventListener('DOMContentLoaded', function() {
             </span>
             <span class="btn-text">Iniciar con Google</span>
         `;
-        
+
         googleBtn.addEventListener('click', handleGoogleSignIn);
-        
+
         // Crear separador
         const separator = document.createElement('div');
         separator.className = 'separator';
         separator.innerHTML = '<span>o</span>';
-        
+
         // Insertar antes del formulario
         loginFormContainer.insertBefore(separator, loginForm);
         loginFormContainer.insertBefore(googleBtn, loginForm);
@@ -129,12 +129,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Intentar iniciar sesión
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                
+
                 // Redirigir al dashboard después del inicio de sesión exitoso
                 window.location.href = 'dashboard.html';
             } catch (error) {
                 let errorMessage = 'Error en el inicio de sesión';
-                
+
                 switch (error.code) {
                     case 'auth/invalid-email':
                         errorMessage = 'Correo electrónico inválido';
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const inputs = [nombreInput, apellidosInput, emailInput, passwordInput, confirmPasswordInput];
         const filledInputs = inputs.filter(input => input.value.trim() !== '').length;
         const progressPercentage = (filledInputs / inputs.length) * 100;
-        
+
         formProgress.style.width = `${progressPercentage}%`;
     }
 
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Actualizar visualización de fuerza
         strengthMeter.style.width = `${strength * 20}%`;
-        
+
         switch(strength) {
             case 0:
             case 1:
@@ -282,14 +282,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Mostrar mensaje de éxito
                 alert('Registro exitoso');
-                
+
                 // Redirigir al inicio de sesión
                 window.location.href = 'index.html';
             } catch (error) {
                 console.error('Error en el registro:', error);
-                
+
                 let errorMessage = 'Error en el registro';
-                
+
                 switch (error.code) {
                     case 'auth/email-already-in-use':
                         errorMessage = 'El correo ya está registrado';
@@ -308,4 +308,67 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+
+    function handleCredentialResponse(response) {
+        try {
+            const jwt = response.credential;
+
+            // 👤 Decodifica el token para obtener la info del usuario
+            const user = parseJwt(jwt);
+            console.log("👤 Usuario autenticado:", user);
+
+            // Mostrar mensaje de bienvenida
+            alert(`Bienvenido ${user.name} (${user.email})`);
+
+            // Almacenar la información de sesión
+            localStorage.setItem('googleToken', jwt);
+            localStorage.setItem('googleUser', JSON.stringify(user));
+
+            // OPCIONAL: Redirigir al usuario a una página de inicio después del login
+            // window.location.href = 'dashboard.html';
+
+            // 🛡️ OPCIONAL: enviar el token a tu backend para validación
+            /*
+            fetch('/api/login/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: jwt })
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return res.json();
+            })
+            .then(data => {
+                // Procesar respuesta del servidor
+                console.log("Respuesta del servidor:", data);
+            })
+            .catch(error => {
+                console.error("Error al comunicarse con el servidor:", error);
+            });
+            */
+        } catch (error) {
+            console.error("Error al procesar la autenticación:", error);
+            alert("Hubo un problema al iniciar sesión con Google");
+        }
+    }
+
+    // Función auxiliar para decodificar el JWT (sin validarlo)
+    function parseJwt(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = decodeURIComponent(atob(base64Url).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(base64);
+        } catch (error) {
+            console.error("Error al decodificar el token:", error);
+            throw new Error("Token inválido");
+        }
+    }
+
+
+
 });
