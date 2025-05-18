@@ -847,4 +847,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial load of notifications
     loadNotifications();
+    // === Mostrar nombre del usuario logueado y manejar el menú ===
+const token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user'));
+
+if (!token || !user) {
+    window.location.href = 'index.html';
+}
+
+const userButton = document.getElementById('userButton');
+const userDropdown = document.getElementById('userDropdown');
+const userDisplayName = document.getElementById('userDisplayName');
+const logoutBtn = document.getElementById('logoutBtn');
+
+if (userButton && userDropdown && userDisplayName && logoutBtn) {
+    userButton.textContent = `👤 ${user.nombre}`;
+    userDisplayName.textContent = `${user.nombre} ${user.apellidos}`;
+
+    userButton.addEventListener('click', () => {
+        userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'index.html';
+    });
+}
+
 });
