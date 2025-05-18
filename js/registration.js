@@ -34,7 +34,7 @@ function checkInputs() {
     apellidosError.style.display = 'none';
   }
 
-  const emailPattern = /^[a-zA-Z]+\.[a-zA-Z]+@academicos\.udg\.mx$/;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailPattern.test(email.value.trim())) {
     emailError.style.display = 'block';
     valid = false;
