@@ -109,6 +109,8 @@ function updateProfileInfo() {
     const apellido = document.getElementById('apellido').value;
     const departamento = document.getElementById('departamento').value;
     const posicion = document.getElementById('posicion').value;
+    const telefono = document.getElementById('telefono').value;
+    const email = document.getElementById('email').value;
     
     // Update profile info
     const profileName = document.querySelector('.profile-name');
@@ -130,7 +132,7 @@ function updateProfileInfo() {
     if(contactEmail && contactPhone && contactSite && contactDate){
         contactEmail.textContent = email;
         contactPhone.textContent = telefono;
-        contactSit.textContent = departamento;
+        contactSite.textContent = departamento;
         contactDate.textContent = posicion;
     }
     
