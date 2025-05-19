@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Servidor en puerto ${PORT}`));
 
 // Configuración de multer para la carga de archivos
-const multer = require('multer');
+//const multer = require('multer');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, '../uploads/') // Carpeta fuera del directorio del usuario
