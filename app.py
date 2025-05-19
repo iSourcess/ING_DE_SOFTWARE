@@ -27,31 +27,26 @@ def allowed_file(filename):
 def index():
     return app.send_static_file('index.html')
 
+# Configurar la ruta de salida para los PDFs convertidos
+PDF_OUTPUT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'converted_pdfs')
+
+# Asegurarse de que el directorio existe
+if not os.path.exists(PDF_OUTPUT_PATH):
+    os.makedirs(PDF_OUTPUT_PATH)
+
 @app.route('/convert', methods=['POST'])
-def convert_file():
-    # Verificar si hay un archivo en la solicitud
-    if 'file' not in request.files:
-        return jsonify({'success': False, 'error': 'No se encontró ningún archivo'})
-    
-    file = request.files['file']
-    
-    # Si el usuario no selecciona un archivo
-    if file.filename == '':
-        return jsonify({'success': False, 'error': 'No se seleccionó ningún archivo'})
-    
-    if file and allowed_file(file.filename):
-        # Guardar el archivo con un nombre seguro
-        timestamp = int(time.time())
-        filename = secure_filename(file.filename)
-        base_filename = f"{timestamp}_{filename}"
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], base_filename)
-        file.save(file_path)
-        
-        # Generar nombre para el archivo PDF de salida
-        output_filename = f"{os.path.splitext(base_filename)[0]}.pdf"
-        output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
-        
-        try:
+def convert_to_pdf():
+    try:
+        # Obtener el archivo del request
+        file = request.files['file']
+        if file:
+            # Generar nombre único para el archivo
+            filename = secure_filename(file.filename)
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            pdf_filename = f"{timestamp}_{os.path.splitext(filename)[0]}.pdf"
+            pdf_path = os.path.join(PDF_OUTPUT_PATH, pdf_filename)
+            
+            # Realizar la conversión y guardar en la nueva ubicación
             # Convertir a PDF usando pdfkit
             pdfkit.from_file(file_path, output_path)
             
@@ -63,12 +58,12 @@ def convert_file():
                 'download_url': download_url
             })
             
-        except Exception as e:
-            return jsonify({'success': False, 'error': str(e)})
-        finally:
-            # Limpiar el archivo temporal
-            if os.path.exists(file_path):
-                os.remove(file_path)
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+    finally:
+         # Limpiar el archivo temporal
+        if os.path.exists(file_path):
+            os.remove(file_path)
     
     return jsonify({'success': False, 'error': 'Tipo de archivo no permitido'})
 
