@@ -116,15 +116,28 @@ function updateProfileInfo() {
     const profileDepartment = document.querySelector('.profile-department');
     
     if (profileName && profilePosition && profileDepartment) {
-        profileName.textContent = `Dr. ${nombre} ${apellido}`;
+        profileName.textContent = `${nombre} ${apellido}`;
         profilePosition.textContent = posicion;
         profileDepartment.textContent = departamento;
+    }
+
+    // Update contact info 
+    const contactEmail = document.querySelector('.contact-email');
+    const contactPhone = document.querySelector('.contact-phone');
+    const contactSite = document.querySelector('.contact-site');
+    const contactDate = document.querySelector('.contact-date');
+
+    if(contactEmail && contactPhone && contactSite && contactDate){
+        contactEmail.textContent = email;
+        contactPhone.textContent = telefono;
+        contactSit.textContent = departamento;
+        contactDate.textContent = posicion;
     }
     
     // Update user menu
     const userName = document.querySelector('.user-name');
     if (userName) {
-        userName.textContent = `Dr. ${nombre} ${apellido}`;
+        userName.textContent = `${nombre} ${apellido}`;
     }
 }
 
