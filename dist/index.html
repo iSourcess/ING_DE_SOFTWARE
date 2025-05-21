@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <!-- SDK de Google Identity -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-BKaFK9tK.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Formulario de Login -->
+        <div class="form-container" id="loginForm">
+            <h2 class="title">Iniciar Sesión</h2>
+
+            <!-- Botón oficial de Google -->
+            <div id="g_id_onload"
+                data-client_id="184928163712-f2e24ket929dk3oc11r6oc2dmbv9titl.apps.googleusercontent.com"
+                data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse"
+                data-auto_prompt="false">
+            </div>
+
+            <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+                data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left">
+            </div>
+
+
+            <!-- Separador -->
+            <div class="separator"><span>o</span></div>
+
+            <form id="loginFormElement">
+                <div class="input-group">
+                    <input type="email" id="loginEmail" placeholder="Correo Electrónico" required>
+                    <span class="error-message" id="loginEmailError">
+                        El correo debe tener un formato valido
+                    </span>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="loginPassword" placeholder="Contraseña" minlength="8" required>
+                    <span class="error-message" id="loginPasswordError">
+                        La contraseña debe tener al menos 8 caracteres
+                    </span>
+                </div>
+
+                <button type="submit">Iniciar Sesión</button>
+            </form>
+
+            <div class="switch-form">
+                <p>¿No tienes cuenta? <a href="registration.html" id="showRegister">Regístrate aquí</a></p>
+            </div>
+        </div>
+
+        <!-- Formulario de Registro -->
+        <div class="form-container" id="registerForm">
+            <h2 class="title">Registro</h2>
+            <form id="registerFormElement">
+                <div class="input-group">
+                    <input type="text" id="registerName" placeholder="Nombre" required>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="registerLastName" placeholder="Apellido" required>
+                </div>
+
+                <div class="input-group">
+                    <input type="email" id="registerEmail" placeholder="correo@academicos.udg.mx"
+                        pattern="[a-zA-Z]+\.[a-zA-Z]+@academicos\.udg\.mx$" required>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="registerPassword" placeholder="Contraseña" minlength="8" required>
+                </div>
+
+                <button type="submit">Registrarse</button>
+            </form>
+
+            <div class="switch-form">
+                <p>¿Ya tienes cuenta? <a href="index.html" id="showLogin">Inicia sesión aquí</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conectar JavaScript -->
+    <script src="js/main.js"></script>
+
+    <!-- Ya no necesitamos crear el botón manualmente -->
+</body>
+
+</html>
